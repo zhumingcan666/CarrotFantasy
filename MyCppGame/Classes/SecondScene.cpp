@@ -72,17 +72,116 @@ bool SecondScene::init()
     auto menu = Menu::create(homeItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
+    /************************************************************************创建怪物精灵***********************************************************************/
+    // 每隔3秒调用一次createAndMoveMonster函数
+    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster), 3.0f, kRepeatForever, 0);
+
     /*********************************************************************创建第一个地图的音乐**********************************************************/
     // 预加载音乐文件
     CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("backmusic.mp3");
 
     // 播放音乐
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("backmusic.mp3", true);
+
+    /******************************************************************创建一个音乐控制按钮****************************************************/
+    auto musicItem = MenuItemImage::create(
+        "share_fan_active.png",
+        "share_fan_disable.png",
+        CC_CALLBACK_1(SecondScene::MusicControl, this));
+
+    // 检查图标是否加载成功，若未加载成功，则输出问题信息
+    if (musicItem == nullptr ||
+        musicItem->getContentSize().width <= 0 ||
+        musicItem->getContentSize().height <= 0)
+    {
+        problemLoading("'share_fan_active.png' 和 'share_fan_disable.png'");
+    }
+    else
+    {
+        // 设置图标的位置
+        float x = origin.x + 1930;
+        float y = origin.y + 1250;
+        musicItem->setPosition(Vec2(x, y));
+    }
+    // 创建菜单，这是一个自动释放的对象
+    auto musicmenu = Menu::create(musicItem, NULL);
+    musicmenu->setPosition(Vec2::ZERO);
+    this->addChild(musicmenu, 2);
+
+    auto label = Label::createWithTTF("Music", "fonts/Marker Felt.ttf", 24);
+    if (label == nullptr)
+    {
+        problemLoading("'fonts/Marker Felt.ttf'");
+    }
+    else
+    {
+        // 将标签定位在屏幕中央
+        label->setPosition(Vec2(origin.x + 1860,
+            origin.y + 1250));
+
+        // 将标签添加为此层的子节点
+        this->addChild(label, 1);
+    }
     return true;
 }
-/************************************************************************返回主菜单按钮的功能函数**********************************************************/
+/************************************************************************返回主菜单按钮的回调函数**********************************************************/
 void SecondScene::menuBackHome(Ref* pSender)
 {
     auto helloWorld = HelloWorld::create();
     Director::getInstance()->replaceScene(helloWorld);
+}
+/***********************************************************************控制背景音乐的回调函数***************************************************************/
+void SecondScene::MusicControl(Ref* sender)
+{
+    // 切换音乐的播放状态
+    if (Musiccontrol % 2 == 0)
+    {
+        // 暂停音乐
+        CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+        Musiccontrol++;
+    }
+    else
+    {
+        // 恢复音乐播放
+        CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+        Musiccontrol++;
+    }
+}
+// 创建并移动怪物的函数
+void SecondScene::createAndMoveMonster(float dt)
+{
+    // 创建一个新的怪物精灵
+    Sprite* monster = Sprite::create("monster0.png");
+    monster->setPosition(Vec2(250, 950));
+    this->addChild(monster, 0);
+
+    // 定义路径
+    Vec2 path[] = {
+        Vec2(603, 950),
+        Vec2(603, 390),
+        Vec2(1340, 390),
+        Vec2(1340, 970),
+        Vec2(1575, 970),
+        // 添加更多路径点...
+    };
+
+    // 创建MoveTo动作
+    auto moveToAction1 = MoveTo::create(5, path[0]);
+    auto moveToAction2 = MoveTo::create(5, path[1]);
+    auto moveToAction3 = MoveTo::create(5, path[2]);
+    auto moveToAction4 = MoveTo::create(5, path[3]);
+    auto moveToAction5 = MoveTo::create(5, path[4]);
+
+    // 创建一个序列动作
+    auto sequence = Sequence::create(
+        moveToAction1,
+        moveToAction2,
+        moveToAction3,
+        moveToAction4,
+        moveToAction5,
+        nullptr
+    );
+
+    // 在新的怪物精灵上运行动作
+    monster->runAction(sequence);
 }
