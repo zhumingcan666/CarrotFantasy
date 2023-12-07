@@ -142,6 +142,26 @@ bool HelloWorld::init()
         // 将标签添加为此层的子节点
         this->addChild(label, 1);
     }
+
+    /******************************************************************创建一个菜单动画****************************************************/
+    auto cache = SpriteFrameCache::getInstance();
+    cache->addSpriteFramesWithFile("roxy.plist");
+
+    Vector<SpriteFrame*> vec;
+    char name[15];
+    memset(name, 0, 15);
+    for (int i = 0; i < 8; i++)
+    {
+        sprintf(name, "%d.png", i);
+        vec.pushBack(cache->getSpriteFrameByName(name));
+    }
+    Animation* animation = Animation::createWithSpriteFrames(vec,0.1f);
+    Animate* animate = Animate::create(animation);
+
+    auto animate_sprite = Sprite::create();
+    addChild(animate_sprite);
+    animate_sprite->setPosition(visibleSize.width / 4, visibleSize.height / 4);
+
     return true;
 }
 /*********************************************************************开始按钮的回调函数************************************************************/
