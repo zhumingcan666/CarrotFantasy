@@ -74,7 +74,7 @@ bool HelloWorld::init()
         startItem->getContentSize().width <= 0 ||
         startItem->getContentSize().height <= 0)
     {
-        problemLoading("'boss.png' �� 'boss_pressed.png'");
+        problemLoading("'boss.png' ， 'boss_pressed.png'");
     }
     else
     {
