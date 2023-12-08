@@ -1,70 +1,98 @@
 #include "HelloWorldScene.h"
-#include"SecondScene.h"
+#include"LevelSelectScene.h"
+#include"BossScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
 
+
 USING_NS_CC;
-/*********************************************************************´´½¨Ö÷²Ëµ¥************************************************************/
+/*********************************************************************åˆ›å»ºä¸»èœå•************************************************************/
 Scene* HelloWorld::createScene()
 {
     return HelloWorld::create();
 }
 
-// ÔÚÎÄ¼þ²»´æÔÚÊ±´òÓ¡ÓÐÓÃµÄ´íÎóÏûÏ¢¶ø²»ÊÇµ¼ÖÂ¶Î´íÎó.
+// åœ¨æ–‡ä»¶ä¸å­˜åœ¨æ—¶æ‰“å°æœ‰ç”¨çš„é”™è¯¯æ¶ˆæ¯è€Œä¸æ˜¯å¯¼è‡´æ®µé”™è¯¯.
 static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
 
-//ÔÚ 'init' ·½·¨ÖÐ£¬ÄãÐèÒª³õÊ¼»¯ÄãµÄÊµÀý
-/*********************************************************************³õÊ¼»¯Ö÷²Ëµ¥************************************************************/
+//åœ¨ 'init' æ–¹æ³•ä¸­ï¼Œä½ éœ€è¦åˆå§‹åŒ–ä½ çš„å®žä¾‹
+/*********************************************************************åˆå§‹åŒ–ä¸»èœå•************************************************************/
 bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
     if (!Scene::init()) {
-        // ³õÊ¼»¯Ê§°Ü
+        // åˆå§‹åŒ–å¤±è´¥
         return false;
     }
 
-    // »ñÈ¡ÆÁÄ»¿É¼û³ß´ç
+    // èŽ·å–å±å¹•å¯è§å°ºå¯¸
     auto visibleSize = Director::getInstance()->getVisibleSize();
-    // »ñÈ¡ÆÁÄ»Ô­µã×ø±ê
+    // èŽ·å–å±å¹•åŽŸç‚¹åæ ‡
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 
-    // Ìí¼ÓÒ»¸ö "¿ªÊ¼" Í¼±êÀ´¿ªÊ¼¡£ÕâÊÇÒ»¸ö×Ô¶¯ÊÍ·ÅµÄ¶ÔÏó
+    // ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ "Ã°ï¿½ï¿½Ä£Ê½" Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½Í·ÅµÄ¶ï¿½ï¿½ï¿½
+
     auto startItem = MenuItemImage::create(
-        "Startgame.png",
-        "Startgame(1).png",
+        "adventure.png",
+        "adventure_pressed.png",
         CC_CALLBACK_1(HelloWorld::StartGame, this));
 
-    // ¼ì²éÍ¼±êÊÇ·ñ¼ÓÔØ³É¹¦£¬ÈôÎ´¼ÓÔØ³É¹¦£¬ÔòÊä³öÎÊÌâÐÅÏ¢
+    // æ£€æŸ¥å›¾æ ‡æ˜¯å¦åŠ è½½æˆåŠŸï¼Œè‹¥æœªåŠ è½½æˆåŠŸï¼Œåˆ™è¾“å‡ºé—®é¢˜ä¿¡æ¯
     if (startItem == nullptr ||
         startItem->getContentSize().width <= 0 ||
         startItem->getContentSize().height <= 0)
     {
-        problemLoading("'CloseNormal.png' ºÍ 'CloseSelected.png'");
+        problemLoading("'CloseNormal.png' å’Œ 'CloseSelected.png'");
     }
     else
     {
-        // ÉèÖÃ¹Ø±ÕÍ¼±êµÄÎ»ÖÃ
-        float x = origin.x + 1150 - startItem->getContentSize().width / 2;
-        float y = origin.y + 170 + startItem->getContentSize().height / 2;
+        // ï¿½ï¿½ï¿½Ã¹Ø±ï¿½Í¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+        float x = origin.x + 1130 - startItem->getContentSize().width / 2;
+        float y = origin.y + 700 + startItem->getContentSize().height / 2;
         startItem->setPosition(Vec2(x, y));
     }
 
-    // ´´½¨²Ëµ¥£¬ÕâÊÇÒ»¸ö×Ô¶¯ÊÍ·ÅµÄ¶ÔÏó
+    // åˆ›å»ºèœå•ï¼Œè¿™æ˜¯ä¸€ä¸ªè‡ªåŠ¨é‡Šæ”¾çš„å¯¹è±¡
     auto menu = Menu::create(startItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
+    // ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ "BossÄ£Ê½" Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½Í·ÅµÄ¶ï¿½ï¿½ï¿½
+    auto bossItem = MenuItemImage::create(
+        "boss.png",
+        "boss_pressed.png",
+        CC_CALLBACK_1(HelloWorld::Bosspatern, this));
 
-    // 3. ÔÚÏÂÃæÌí¼ÓÄãµÄ´úÂë...
+    // ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ø³É¹ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½Ø³É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+    if (startItem == nullptr ||
+        startItem->getContentSize().width <= 0 ||
+        startItem->getContentSize().height <= 0)
+    {
+        problemLoading("'boss.png' ï¿½ï¿½ 'boss_pressed.png'");
+    }
+    else
+    {
+        // ï¿½ï¿½ï¿½Ã¹Ø±ï¿½Í¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+        float x = -5;
+        float y = -30;
+        bossItem->setPosition(Vec2(x, y));
+    }
 
- //// Ìí¼ÓÒ»¸öÏÔÊ¾ "Hello World" µÄ±êÇ©
- //// ´´½¨²¢³õÊ¼»¯Ò»¸ö±êÇ©
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½Í·ÅµÄ¶ï¿½ï¿½ï¿½
+    auto menu1 = Menu::create(bossItem, NULL);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu1, 3);
+
+    // 3. åœ¨ä¸‹é¢æ·»åŠ ä½ çš„ä»£ç ...
+
+ //// æ·»åŠ ä¸€ä¸ªæ˜¾ç¤º "Hello World" çš„æ ‡ç­¾
+ //// åˆ›å»ºå¹¶åˆå§‹åŒ–ä¸€ä¸ªæ ‡ç­¾
  //   auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
  //   if (label == nullptr)
  //   {
@@ -72,15 +100,15 @@ bool HelloWorld::init()
  //   }
  //   else
  //   {
- //       // ½«±êÇ©¶¨Î»ÔÚÆÁÄ»ÖÐÑë
+ //       // å°†æ ‡ç­¾å®šä½åœ¨å±å¹•ä¸­å¤®
  //       label->setPosition(Vec2(origin.x + visibleSize.width / 2,
  //           origin.y + visibleSize.height - label->getContentSize().height));
 
- //       // ½«±êÇ©Ìí¼ÓÎª´Ë²ãµÄ×Ó½Úµã
+ //       // å°†æ ‡ç­¾æ·»åŠ ä¸ºæ­¤å±‚çš„å­èŠ‚ç‚¹
  //       this->addChild(label, 1);
  //   }
 
-    // Ìí¼Ó "HelloWorld" µÄÆô¶¯»­Ãæ
+    // æ·»åŠ  "HelloWorld" çš„å¯åŠ¨ç”»é¢
     auto sprite = Sprite::create("menu(2).png");
     if (sprite == nullptr)
     {
@@ -88,42 +116,42 @@ bool HelloWorld::init()
     }
     else
     {
-        // ½«Ö÷²Ëµ¥¶¨Î»ÔÚÆÁÄ»ÖÐÑë
+        // å°†ä¸»èœå•å®šä½åœ¨å±å¹•ä¸­å¤®
         sprite->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
-        // ½«Ö÷²Ëµ¥Ìí¼ÓÎª´Ë²ãµÄ×Ó½Úµã
+        // å°†ä¸»èœå•æ·»åŠ ä¸ºæ­¤å±‚çš„å­èŠ‚ç‚¹
         this->addChild(sprite, 0);
     }
-    /*********************************************************************´´½¨Ö÷²Ëµ¥ÒôÀÖ***********************************************************/
-    // Ô¤¼ÓÔØÒôÀÖÎÄ¼þ
+    /*********************************************************************åˆ›å»ºä¸»èœå•éŸ³ä¹***********************************************************/
+    // é¢„åŠ è½½éŸ³ä¹æ–‡ä»¶
     CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("menumusic.mp3");
 
-    // ²¥·ÅÒôÀÖ
+    // æ’­æ”¾éŸ³ä¹
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("menumusic.mp3", true);
 
 
 
-    /******************************************************************´´½¨Ò»¸öÒôÀÖ¿ØÖÆ°´Å¥****************************************************/
+    /******************************************************************åˆ›å»ºä¸€ä¸ªéŸ³ä¹æŽ§åˆ¶æŒ‰é’®****************************************************/
     auto musicItem = MenuItemImage::create(
         "share_fan_active.png",
         "share_fan_disable.png",
         CC_CALLBACK_1(HelloWorld::MusicControl, this));
 
-    // ¼ì²éÍ¼±êÊÇ·ñ¼ÓÔØ³É¹¦£¬ÈôÎ´¼ÓÔØ³É¹¦£¬ÔòÊä³öÎÊÌâÐÅÏ¢
+    // æ£€æŸ¥å›¾æ ‡æ˜¯å¦åŠ è½½æˆåŠŸï¼Œè‹¥æœªåŠ è½½æˆåŠŸï¼Œåˆ™è¾“å‡ºé—®é¢˜ä¿¡æ¯
     if (musicItem == nullptr ||
         musicItem->getContentSize().width <= 0 ||
         musicItem->getContentSize().height <= 0)
     {
-        problemLoading("'share_fan_active.png' ºÍ 'share_fan_disable.png'");
+        problemLoading("'share_fan_active.png' å’Œ 'share_fan_disable.png'");
     }
     else
     {
-        // ÉèÖÃ¹Ø±ÕÍ¼±êµÄÎ»ÖÃ
+        // è®¾ç½®å…³é—­å›¾æ ‡çš„ä½ç½®
         float x = origin.x + 1900;
         float y = origin.y + 1250;
         musicItem->setPosition(Vec2(x, y));
     }
-    // ´´½¨²Ëµ¥£¬ÕâÊÇÒ»¸ö×Ô¶¯ÊÍ·ÅµÄ¶ÔÏó
+    // åˆ›å»ºèœå•ï¼Œè¿™æ˜¯ä¸€ä¸ªè‡ªåŠ¨é‡Šæ”¾çš„å¯¹è±¡
     auto musicmenu = Menu::create(musicItem, NULL);
     musicmenu->setPosition(Vec2::ZERO);
     this->addChild(musicmenu, 2);
@@ -135,62 +163,78 @@ bool HelloWorld::init()
     }
     else
     {
-        // ½«±êÇ©¶¨Î»ÔÚÆÁÄ»ÖÐÑë
+        // å°†æ ‡ç­¾å®šä½åœ¨å±å¹•ä¸­å¤®
         label->setPosition(Vec2(origin.x + 1810,
             origin.y +1250));
 
-        // ½«±êÇ©Ìí¼ÓÎª´Ë²ãµÄ×Ó½Úµã
+        // å°†æ ‡ç­¾æ·»åŠ ä¸ºæ­¤å±‚çš„å­èŠ‚ç‚¹
         this->addChild(label, 1);
     }
+/*****************************************************************ï¿½ï¿½ï¿½Ã²Ëµï¿½ï¿½ï¿½ï¿½ï¿½********************************************************************/
 
-    /******************************************************************´´½¨Ò»¸ö²Ëµ¥¶¯»­****************************************************/
-    auto cache = SpriteFrameCache::getInstance();
-    cache->addSpriteFramesWithFile("roxy.plist");
+  // ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½é£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¸ï¿½ï¿½ï¿½ï¿½Ä¶ï¿½ï¿½ï¿½
+    Sprite* animatedSprite0 = Sprite::create("monster1.png");
+    animatedSprite0->setPosition(Vec2(320, 880));
+    this->addChild(animatedSprite0);
 
-    Vector<SpriteFrame*> vec;
-    char name[15];
-    memset(name, 0, 15);
-    for (int i = 0; i < 8; i++)
-    {
-        sprintf(name, "%d.png", i);
-        vec.pushBack(cache->getSpriteFrameByName(name));
-    }
-    Animation* animation = Animation::createWithSpriteFrames(vec,0.1f);
-    Animate* animate = Animate::create(animation);
+    auto moveUp = MoveBy::create(1.0f, Vec2(0, 20));   // ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½30ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    auto moveDown = MoveBy::create(1.0f, Vec2(0, -20)); // ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½30ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    auto sequenceMove = Sequence::create(moveUp, moveDown, nullptr);
+    auto repeatForeverMove = RepeatForever::create(sequenceMove);
+    animatedSprite0->runAction(repeatForeverMove);
 
-    auto animate_sprite = Sprite::create();
-    addChild(animate_sprite);
-    animate_sprite->setPosition(visibleSize.width / 4, visibleSize.height / 4);
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½é£¬ï¿½ï¿½ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½Ð¡ï¿½Ä¶ï¿½ï¿½ï¿½
+    Sprite* animatedSprite1 = Sprite::create("monster2.png");
+    animatedSprite1->setPosition(Vec2(1720, 280));
+    this->addChild(animatedSprite1);
+
+    auto scaleUp = ScaleTo::create(1.0f, 1.01f);   // ï¿½ï¿½ï¿½Åµï¿½Ô­Ê¼ï¿½ï¿½Ð¡ï¿½ï¿½1.1ï¿½ï¿½
+    auto scaleDown = ScaleTo::create(1.0f, 0.991f); // ï¿½ï¿½ï¿½Åµï¿½Ô­Ê¼ï¿½ï¿½Ð¡ï¿½ï¿½0.9ï¿½ï¿½
+    auto sequenceScale = Sequence::create(scaleUp, scaleDown, nullptr);
+    auto repeatForeverScale = RepeatForever::create(sequenceScale);
+    animatedSprite1->runAction(repeatForeverScale);
+
 
     return true;
 }
-/*********************************************************************¿ªÊ¼°´Å¥µÄ»Øµ÷º¯Êý************************************************************/
+/*********************************************************************å¼€å§‹æŒ‰é’®çš„å›žè°ƒå‡½æ•°************************************************************/
 
 void HelloWorld::StartGame(Ref* pSender)
 {
-    // ÇÐ»»Ö÷²Ëµ¥³¡¾°ÖÁµÚÒ»¸öµØÍ¼³¡¾°
-    auto secondScene = SecondScene::create();
-    Director::getInstance()->replaceScene(secondScene);
+    // ï¿½Ð»ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+    auto levelSelectScene = LevelSelectScene::create();
+    Director::getInstance()->replaceScene(levelSelectScene);
 
-    /* ÈôÒªÔÚ²»ÍË³öÓ¦ÓÃ³ÌÐòµÄÇé¿öÏÂ·µ»Øµ½Ô­Éú iOS ÆÁÄ»£¨Èç¹û´æÔÚ£©£¬Çë²»ÒªÊ¹ÓÃÉÏÊöµÄ Director::getInstance()->end()£¬
-    ¶øÊÇ´¥·¢ RootViewController.mm ÖÐ´´½¨µÄ×Ô¶¨ÒåÊÂ¼þ£¬ÈçÏÂËùÊ¾ */
+
+    /* è‹¥è¦åœ¨ä¸é€€å‡ºåº”ç”¨ç¨‹åºçš„æƒ…å†µä¸‹è¿”å›žåˆ°åŽŸç”Ÿ iOS å±å¹•ï¼ˆå¦‚æžœå­˜åœ¨ï¼‰ï¼Œè¯·ä¸è¦ä½¿ç”¨ä¸Šè¿°çš„ Director::getInstance()->end()ï¼Œ
+    è€Œæ˜¯è§¦å‘ RootViewController.mm ä¸­åˆ›å»ºçš„è‡ªå®šä¹‰äº‹ä»¶ï¼Œå¦‚ä¸‹æ‰€ç¤º */
 
     // EventCustom customEndEvent("game_scene_close_event");
     // _eventDispatcher->dispatchEvent(&customEndEvent);
 }
-/*****************************************************************²Ëµ¥±³¾°ÒôÀÖ¿ØÖÆ°´Å¥µÄ»Øµ÷º¯Êý************************************************************/
+
+    /*********************************************************************BossÄ£Ê½ï¿½ï¿½Å¥ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½************************************************************/
+
+    void HelloWorld::Bosspatern(Ref * pSender)
+    {
+        // ï¿½Ð»ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+        auto bossScene = BossScene::create();
+        Director::getInstance()->replaceScene(bossScene);
+    }
+/*****************************************************************ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¿ï¿½ï¿½Æ°ï¿½Å¥ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½************************************************************/
+
 void HelloWorld::MusicControl(Ref* sender)
 {
-    // ÇÐ»»ÒôÀÖµÄ²¥·Å×´Ì¬
+    // åˆ‡æ¢éŸ³ä¹çš„æ’­æ”¾çŠ¶æ€
     if (Musiccontrol %2==0)
     {
-        // ÔÝÍ£ÒôÀÖ
+        // æš‚åœéŸ³ä¹
         CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
         Musiccontrol++;
     }
     else
     {
-        // »Ö¸´ÒôÀÖ²¥·Å
+        // æ¢å¤éŸ³ä¹æ’­æ”¾
         CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
         Musiccontrol++;
     }
