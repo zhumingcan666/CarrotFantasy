@@ -1,8 +1,10 @@
 #include "HelloWorldScene.h"
-#include"SecondScene.h"
+#include"LevelSelectScene.h"
+#include"BossScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
+
 
 USING_NS_CC;
 /*********************************************************************创建主菜单************************************************************/
@@ -35,10 +37,11 @@ bool HelloWorld::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 
-    // 添加一个 "开始" 图标来开始。这是一个自动释放的对象
+    // ����һ�� "ð��ģʽ" ͼ������ʼ������һ���Զ��ͷŵĶ���
+
     auto startItem = MenuItemImage::create(
-        "Startgame.png",
-        "Startgame(1).png",
+        "adventure.png",
+        "adventure_pressed.png",
         CC_CALLBACK_1(HelloWorld::StartGame, this));
 
     // 检查图标是否加载成功，若未加载成功，则输出问题信息
@@ -50,9 +53,9 @@ bool HelloWorld::init()
     }
     else
     {
-        // 设置关闭图标的位置
-        float x = origin.x + 1150 - startItem->getContentSize().width / 2;
-        float y = origin.y + 170 + startItem->getContentSize().height / 2;
+        // ���ùر�ͼ���λ��
+        float x = origin.x + 1130 - startItem->getContentSize().width / 2;
+        float y = origin.y + 700 + startItem->getContentSize().height / 2;
         startItem->setPosition(Vec2(x, y));
     }
 
@@ -60,6 +63,31 @@ bool HelloWorld::init()
     auto menu = Menu::create(startItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
+    // ����һ�� "Bossģʽ" ͼ������ʼ������һ���Զ��ͷŵĶ���
+    auto bossItem = MenuItemImage::create(
+        "boss.png",
+        "boss_pressed.png",
+        CC_CALLBACK_1(HelloWorld::Bosspatern, this));
+
+    // ���ͼ���Ƿ���سɹ�����δ���سɹ��������������Ϣ
+    if (startItem == nullptr ||
+        startItem->getContentSize().width <= 0 ||
+        startItem->getContentSize().height <= 0)
+    {
+        problemLoading("'boss.png' �� 'boss_pressed.png'");
+    }
+    else
+    {
+        // ���ùر�ͼ���λ��
+        float x = -5;
+        float y = -30;
+        bossItem->setPosition(Vec2(x, y));
+    }
+
+    // �����˵�������һ���Զ��ͷŵĶ���
+    auto menu1 = Menu::create(bossItem, NULL);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu1, 3);
 
     // 3. 在下面添加你的代码...
 
@@ -142,36 +170,41 @@ bool HelloWorld::init()
         // 将标签添加为此层的子节点
         this->addChild(label, 1);
     }
+/*****************************************************************���ò˵�����********************************************************************/
 
-    /******************************************************************创建一个菜单动画****************************************************/
-    auto cache = SpriteFrameCache::getInstance();
-    cache->addSpriteFramesWithFile("roxy.plist");
+  // ����һ�����飬���������¸����Ķ���
+    Sprite* animatedSprite0 = Sprite::create("monster1.png");
+    animatedSprite0->setPosition(Vec2(320, 880));
+    this->addChild(animatedSprite0);
 
-    Vector<SpriteFrame*> vec;
-    char name[15];
-    memset(name, 0, 15);
-    for (int i = 0; i < 8; i++)
-    {
-        sprintf(name, "%d.png", i);
-        vec.pushBack(cache->getSpriteFrameByName(name));
-    }
-    Animation* animation = Animation::createWithSpriteFrames(vec,0.1f);
-    Animate* animate = Animate::create(animation);
+    auto moveUp = MoveBy::create(1.0f, Vec2(0, 20));   // �����ƶ�30������
+    auto moveDown = MoveBy::create(1.0f, Vec2(0, -20)); // �����ƶ�30������
+    auto sequenceMove = Sequence::create(moveUp, moveDown, nullptr);
+    auto repeatForeverMove = RepeatForever::create(sequenceMove);
+    animatedSprite0->runAction(repeatForeverMove);
 
-    auto animate_sprite = Sprite::create();
-    addChild(animate_sprite);
-    animate_sprite->setPosition(visibleSize.width / 4, visibleSize.height / 4);
-    animate_sprite->runAction(RepeatForever::create(animate));
-    
+    // ������һ�����飬�����ӱ���С�Ķ���
+    Sprite* animatedSprite1 = Sprite::create("monster2.png");
+    animatedSprite1->setPosition(Vec2(1720, 280));
+    this->addChild(animatedSprite1);
+
+    auto scaleUp = ScaleTo::create(1.0f, 1.01f);   // ���ŵ�ԭʼ��С��1.1��
+    auto scaleDown = ScaleTo::create(1.0f, 0.991f); // ���ŵ�ԭʼ��С��0.9��
+    auto sequenceScale = Sequence::create(scaleUp, scaleDown, nullptr);
+    auto repeatForeverScale = RepeatForever::create(sequenceScale);
+    animatedSprite1->runAction(repeatForeverScale);
+
+
     return true;
 }
 /*********************************************************************开始按钮的回调函数************************************************************/
 
 void HelloWorld::StartGame(Ref* pSender)
 {
-    // 切换主菜单场景至第一个地图场景
-    auto secondScene = SecondScene::create();
-    Director::getInstance()->replaceScene(secondScene);
+    // �л����˵���������һ����ͼ����
+    auto levelSelectScene = LevelSelectScene::create();
+    Director::getInstance()->replaceScene(levelSelectScene);
+
 
     /* 若要在不退出应用程序的情况下返回到原生 iOS 屏幕（如果存在），请不要使用上述的 Director::getInstance()->end()，
     而是触发 RootViewController.mm 中创建的自定义事件，如下所示 */
@@ -179,7 +212,17 @@ void HelloWorld::StartGame(Ref* pSender)
     // EventCustom customEndEvent("game_scene_close_event");
     // _eventDispatcher->dispatchEvent(&customEndEvent);
 }
-/*****************************************************************菜单背景音乐控制按钮的回调函数************************************************************/
+
+    /*********************************************************************Bossģʽ��ť�Ļص�����************************************************************/
+
+    void HelloWorld::Bosspatern(Ref * pSender)
+    {
+        // �л����˵���������һ����ͼ����
+        auto bossScene = BossScene::create();
+        Director::getInstance()->replaceScene(bossScene);
+    }
+/*****************************************************************�˵��������ֿ��ư�ť�Ļص�����************************************************************/
+
 void HelloWorld::MusicControl(Ref* sender)
 {
     // 切换音乐的播放状态

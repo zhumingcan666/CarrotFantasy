@@ -10,7 +10,7 @@ public:
     int Musiccontrol = 0;//计数器，记录音乐控制按钮点击次数
     virtual bool init();
     // 创建并移动怪物的函数
-    void createAndMoveMonster(float dt);
+    void createAndMoveMonster0(float dt);
     void menuBackHome(cocos2d::Ref* pSender);
     void SecondScene::MusicControl(Ref* sender);
     // implement the "static create()" method manually
