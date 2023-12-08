@@ -1,8 +1,10 @@
 #include "HelloWorldScene.h"
-#include"SecondScene.h"
+#include"LevelSelectScene.h"
+#include"BossScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
+
 
 USING_NS_CC;
 /*********************************************************************创建主菜单************************************************************/
@@ -35,10 +37,10 @@ bool HelloWorld::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 
-    // 添加一个 "开始" 图标来开始。这是一个自动释放的对象
+    // 添加一个 "冒险模式" 图标来开始。这是一个自动释放的对象
     auto startItem = MenuItemImage::create(
-        "Startgame.png",
-        "Startgame(1).png",
+        "adventure.png",
+        "adventure_pressed.png",
         CC_CALLBACK_1(HelloWorld::StartGame, this));
 
     // 检查图标是否加载成功，若未加载成功，则输出问题信息
@@ -51,8 +53,8 @@ bool HelloWorld::init()
     else
     {
         // 设置关闭图标的位置
-        float x = origin.x + 1150 - startItem->getContentSize().width / 2;
-        float y = origin.y + 170 + startItem->getContentSize().height / 2;
+        float x = origin.x + 1130 - startItem->getContentSize().width / 2;
+        float y = origin.y + 700 + startItem->getContentSize().height / 2;
         startItem->setPosition(Vec2(x, y));
     }
 
@@ -60,6 +62,31 @@ bool HelloWorld::init()
     auto menu = Menu::create(startItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
+    // 添加一个 "Boss模式" 图标来开始。这是一个自动释放的对象
+    auto bossItem = MenuItemImage::create(
+        "boss.png",
+        "boss_pressed.png",
+        CC_CALLBACK_1(HelloWorld::Bosspatern, this));
+
+    // 检查图标是否加载成功，若未加载成功，则输出问题信息
+    if (startItem == nullptr ||
+        startItem->getContentSize().width <= 0 ||
+        startItem->getContentSize().height <= 0)
+    {
+        problemLoading("'boss.png' 和 'boss_pressed.png'");
+    }
+    else
+    {
+        // 设置关闭图标的位置
+        float x = -5;
+        float y = -30;
+        bossItem->setPosition(Vec2(x, y));
+    }
+
+    // 创建菜单，这是一个自动释放的对象
+    auto menu1 = Menu::create(bossItem, NULL);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu1, 3);
 
     // 3. 在下面添加你的代码...
 
@@ -142,6 +169,32 @@ bool HelloWorld::init()
         // 将标签添加为此层的子节点
         this->addChild(label, 1);
     }
+/*****************************************************************放置菜单动画********************************************************************/
+
+  // 创建一个精灵，并添加上下浮动的动作
+    Sprite* animatedSprite0 = Sprite::create("monster1.png");
+    animatedSprite0->setPosition(Vec2(320, 880));
+    this->addChild(animatedSprite0);
+
+    auto moveUp = MoveBy::create(1.0f, Vec2(0, 20));   // 向上移动30个像素
+    auto moveDown = MoveBy::create(1.0f, Vec2(0, -20)); // 向下移动30个像素
+    auto sequenceMove = Sequence::create(moveUp, moveDown, nullptr);
+    auto repeatForeverMove = RepeatForever::create(sequenceMove);
+    animatedSprite0->runAction(repeatForeverMove);
+
+    // 创建另一个精灵，并添加变大变小的动作
+    Sprite* animatedSprite1 = Sprite::create("monster2.png");
+    animatedSprite1->setPosition(Vec2(1720, 280));
+    this->addChild(animatedSprite1);
+
+    auto scaleUp = ScaleTo::create(1.0f, 1.01f);   // 缩放到原始大小的1.1倍
+    auto scaleDown = ScaleTo::create(1.0f, 0.991f); // 缩放到原始大小的0.9倍
+    auto sequenceScale = Sequence::create(scaleUp, scaleDown, nullptr);
+    auto repeatForeverScale = RepeatForever::create(sequenceScale);
+    animatedSprite1->runAction(repeatForeverScale);
+
+
+
     return true;
 }
 /*********************************************************************开始按钮的回调函数************************************************************/
@@ -149,8 +202,8 @@ bool HelloWorld::init()
 void HelloWorld::StartGame(Ref* pSender)
 {
     // 切换主菜单场景至第一个地图场景
-    auto secondScene = SecondScene::create();
-    Director::getInstance()->replaceScene(secondScene);
+    auto levelSelectScene = LevelSelectScene::create();
+    Director::getInstance()->replaceScene(levelSelectScene);
 
     /* 若要在不退出应用程序的情况下返回到原生 iOS 屏幕（如果存在），请不要使用上述的 Director::getInstance()->end()，
     而是触发 RootViewController.mm 中创建的自定义事件，如下所示 */
@@ -158,6 +211,14 @@ void HelloWorld::StartGame(Ref* pSender)
     // EventCustom customEndEvent("game_scene_close_event");
     // _eventDispatcher->dispatchEvent(&customEndEvent);
 }
+    /*********************************************************************Boss模式按钮的回调函数************************************************************/
+
+    void HelloWorld::Bosspatern(Ref * pSender)
+    {
+        // 切换主菜单场景至第一个地图场景
+        auto bossScene = BossScene::create();
+        Director::getInstance()->replaceScene(bossScene);
+    }
 /*****************************************************************菜单背景音乐控制按钮的回调函数************************************************************/
 void HelloWorld::MusicControl(Ref* sender)
 {

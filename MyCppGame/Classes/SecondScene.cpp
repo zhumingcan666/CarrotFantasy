@@ -3,6 +3,8 @@
 #include"SecondScene.h"
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
+#include <cstdlib>  // 包含随机数函数的头文件
+#include <ctime>    // 包含时间函数的头文件
 
 USING_NS_CC;
 /*********************************************************************创建第一个地图场景**********************************************************/
@@ -33,10 +35,10 @@ bool SecondScene::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     // 添加 "SecondScene" 的启动画面
-    auto sprite = Sprite::create("map.png");
+    auto sprite = Sprite::create("bg1.png");
     if (sprite == nullptr)
     {
-        problemLoading("'map.png'");
+        problemLoading("'bg1.png'");
     }
     else
     {
@@ -46,10 +48,36 @@ bool SecondScene::init()
         // 将场景图片添加为此层的子节点
         this->addChild(sprite, 0);
     }
+    auto road = Sprite::create("road1.png");
+    if (road == nullptr)
+    {
+        problemLoading("'road1.png'");
+    }
+    else
+    {
+        // 将场景图片定位在屏幕中央
+        road->setPosition(Vec2(visibleSize.width / 2 + origin.x,500));
+
+        // 将场景图片添加为此层的子节点
+        this->addChild(road, 0);
+    }
+    auto menubg = Sprite::create("menubg(1).png");
+    if (menubg == nullptr)
+    {
+        problemLoading("'menubg(1).png'");
+    }
+    else
+    {
+        // 将场景图片定位在屏幕中央
+        menubg->setPosition(Vec2(visibleSize.width / 2 + origin.x-70, 1250));
+
+        // 将场景图片添加为此层的子节点
+        this->addChild(menubg, 0);
+    }
     /*********************************************************************创建一个返回主菜单按钮（homeItem)**********************************************************/
     auto homeItem = MenuItemImage::create(
-        "return.png",
-        "return(1).png",
+        "back.png",
+        "back_pressed.png",
         CC_CALLBACK_1(SecondScene::menuBackHome, this));
 
     // 检查图标是否加载成功，若未加载成功，则输出问题信息
@@ -62,8 +90,8 @@ bool SecondScene::init()
     else
     {
         // 设置返回按钮的位置为左上角
-        float x = origin.x - 50 + homeItem->getContentSize().width / 2;
-        float y = visibleSize.height + 80 - (origin.y + 10 + homeItem->getContentSize().height / 2);
+        float x = 30;
+        float y = 1250;
         homeItem->setPosition(Vec2(x, y));
 
     }
@@ -74,7 +102,7 @@ bool SecondScene::init()
     this->addChild(menu, 1);
     /************************************************************************创建怪物精灵***********************************************************************/
     // 每隔3秒调用一次createAndMoveMonster函数
-    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster), 3.0f, kRepeatForever, 0);
+    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster0), 3.0f, kRepeatForever, 0);
 
     /*********************************************************************创建第一个地图的音乐**********************************************************/
     // 预加载音乐文件
@@ -148,7 +176,7 @@ void SecondScene::MusicControl(Ref* sender)
     }
 }
 // 创建并移动怪物的函数
-void SecondScene::createAndMoveMonster(float dt)
+void SecondScene::createAndMoveMonster0(float dt)
 {
     // 创建一个新的怪物精灵
     Sprite* monster = Sprite::create("monster0.png");
@@ -184,4 +212,11 @@ void SecondScene::createAndMoveMonster(float dt)
 
     // 在新的怪物精灵上运行动作
     monster->runAction(sequence);
+
+    // 生成一个2到4秒之间的随机时间间隔
+    float randomInterval = 2.0f + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f;
+
+    // 重新调度下一次怪物的生成
+    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster0), randomInterval, 0, 0);
 }
+

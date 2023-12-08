@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 
+
 class HelloWorld : public cocos2d::Scene
 {
 public:
@@ -11,6 +12,7 @@ public:
     virtual bool init();
     // a selector callback
     void StartGame(cocos2d::Ref* pSender);
+    void Bosspatern(Ref* pSender);
     void HelloWorld::MusicControl(Ref* sender);
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
