@@ -3,6 +3,7 @@
 #include"SecondScene.h"
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
+#include"carrot.h"
 #include <cstdlib>  // 包含随机数函数的头文件
 #include <ctime>    // 包含时间函数的头文件
 
@@ -150,6 +151,12 @@ bool SecondScene::init()
         // 将标签添加为此层的子节点
         this->addChild(label, 1);
     }
+
+    /******************************************************************创建萝卜****************************************************/
+    auto carrot = Carrot::createSprite(1775,995);
+    addChild(carrot);
+    
+
     return true;
 }
 /************************************************************************返回主菜单按钮的回调函数**********************************************************/
