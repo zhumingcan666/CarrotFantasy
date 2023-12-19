@@ -2,6 +2,8 @@
 #include "HelloWorldScene.h"
 #include"ThirdScene.h"
 #include "ui/CocosGUI.h"
+#include"carrot.h"
+#include"Monster.h"
 #include <cstdlib>  // 包含随机数函数的头文件
 #include <ctime>    // 包含时间函数的头文件
 
@@ -101,7 +103,7 @@ bool ThirdScene::init()
     this->addChild(menu, 1);
     /************************************************************************创建怪物精灵***********************************************************************/
     // 每隔3秒调用一次createAndMoveMonster函数
-    schedule(CC_SCHEDULE_SELECTOR(ThirdScene::createAndMoveMonster0), 3.0f, kRepeatForever, 0);
+    schedule(CC_SCHEDULE_SELECTOR(ThirdScene::createAndMoveMonster0), 1.0f, 7, 0);
 
     /*********************************************************************创建第一个地图的音乐**********************************************************/
     // 预加载音乐文件
@@ -149,6 +151,9 @@ bool ThirdScene::init()
         // 将标签添加为此层的子节点
         this->addChild(label, 1);
     }
+    /******************************************************************创建萝卜****************************************************/
+    auto carrot = Carrot::createSprite(760, 1012);
+    addChild(carrot);
     return true;
 }
 /************************************************************************返回主菜单按钮的回调函数**********************************************************/
@@ -177,44 +182,15 @@ void ThirdScene::MusicControl(Ref* sender)
 // 创建并移动怪物的函数
 void ThirdScene::createAndMoveMonster0(float dt)
 {
-    // 创建一个新的怪物精灵
-    Sprite* monster = Sprite::create("monster0.png");
-    monster->setPosition(Vec2(250, 950));
-    this->addChild(monster, 0);
-
-    // 定义路径
-    Vec2 path[] = {
-        Vec2(603, 950),
-        Vec2(603, 390),
-        Vec2(1340, 390),
-        Vec2(1340, 970),
-        Vec2(1575, 970),
+    std::vector<Vec2> path= {
+        Vec2(116*4, 102 * 4),
+        Vec2(116 * 4, 178*4),
+        Vec2(385*4, 178 * 4),
+        Vec2(385 * 4, 253*4),
+        Vec2(194*4, 253*4),
         // 添加更多路径点...
     };
-
-    // 创建MoveTo动作
-    auto moveToAction1 = MoveTo::create(5, path[0]);
-    auto moveToAction2 = MoveTo::create(5, path[1]);
-    auto moveToAction3 = MoveTo::create(5, path[2]);
-    auto moveToAction4 = MoveTo::create(5, path[3]);
-    auto moveToAction5 = MoveTo::create(5, path[4]);
-
-    // 创建一个序列动作
-    auto sequence = Sequence::create(
-        moveToAction1,
-        moveToAction2,
-        moveToAction3,
-        moveToAction4,
-        moveToAction5,
-        nullptr
-    );
-
-    // 在新的怪物精灵上运行动作
-    monster->runAction(sequence);
-
-    // 生成一个2到4秒之间的随机时间间隔
-    float randomInterval = 2.0f + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f;
-
-    // 重新调度下一次怪物的生成
-    schedule(CC_SCHEDULE_SELECTOR(ThirdScene::createAndMoveMonster0), randomInterval, 0, 0);
+    Monster* monster = Monster::create(5000.0f, 100, "monster1.png", 20, 50, path);
+    monster->setPosition(Vec2(314*4, 102*4));
+    addChild(monster);
 }
