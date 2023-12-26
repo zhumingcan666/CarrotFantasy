@@ -16,6 +16,9 @@ public:
     // 创建并移动怪物的函数
     void menuBackHome(cocos2d::Ref* pSender);
     void SecondScene::MusicControl(Ref* sender);
+    void createAndMoveMonster0(float dt);
+
+    void createBarriers(float dt);
 
     // implement the "static create()" method manually
     CREATE_FUNC(SecondScene);
