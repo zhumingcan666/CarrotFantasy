@@ -4,7 +4,9 @@
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
 #include"carrot.h"
-#include"Bullet.h"
+#include"Tower.h"
+#include"Tower2.h"
+//#include"Bullet.h"
 #include<vector>
 #include"Coin.h"
 #include"Monster.h"
@@ -171,11 +173,17 @@ bool SecondScene::init()
     auto carrot = Carrot::createSprite(1775, 995);
     carrot->setTag(1);
     addChild(carrot);
+    /******************************************************************创建炮塔***********************************************************/
+    Tower* tower = Tower::createTower("Bottle11.png");
 
+    this->addChild(tower);
+    Tower2* fan = Tower2::createTower("Fan11.png");
+
+    this->addChild(fan);
     /************************************************************************创建怪物精灵***********************************************************************/
     schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster0), 4.0f, 7, 0);
     /************************************************************************创建障碍物***********************************************************************/
-  scheduleOnce(CC_SCHEDULE_SELECTOR(SecondScene::createBarriers), 0.0f);
+  //scheduleOnce(CC_SCHEDULE_SELECTOR(SecondScene::createBarriers), 0.0f);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*********************************************************************创建金币系统**********************************************************/
@@ -228,43 +236,43 @@ void SecondScene::createAndMoveMonster0(float dt)
     monster->setPosition(Vec2(230, 970));
     addChild(monster);
 }
-void SecondScene::createBarriers(float dt)
-{
-
-  std::vector<Vec2> path = {
-Vec2(117*4, 172*4),
-Vec2(152*4,172 * 4),
-Vec2(120*4, 234*4),
-Vec2(200*4, 215*4),
-Vec2(242*4, 90*4),
-Vec2(261*4, 210*4),
-Vec2(1738, 970),
-// 添加更多路径点...
-    };
-
-      Barrier* barrier1 = Barrier::create("Barrier1.png", 100, 100);
-      barrier1->setPosition(path[0]);
-      addChild(barrier1);
-
-      Barrier* barrier2 = Barrier::create("Barrier1.png", 100, 100);
-      barrier2->setPosition(path[1]);
-      addChild(barrier2);
-
-
-      Barrier* barrier3 = Barrier::create("Barrier2.png", 100, 100);
-      barrier3->setPosition(path[2]);
-      addChild(barrier3);
-
-      Barrier* barrier4 = Barrier::create("Barrier3.png", 100, 100);
-      barrier4->setPosition(path[3]);
-      addChild(barrier4);
-
-      Barrier* barrier5 = Barrier::create("Barrier4.png", 100, 100);
-      barrier5->setPosition(path[4]);
-      addChild(barrier5);
-
-      Barrier* barrier6 = Barrier::create("Barrier3.png", 100, 100);
-      barrier6->setPosition(path[5]);
-      addChild(barrier6);
-
-}
+//void SecondScene::createBarriers(float dt)
+//{
+//
+//  std::vector<Vec2> path = {
+//Vec2(117*4, 172*4),
+//Vec2(152*4,172 * 4),
+//Vec2(120*4, 234*4),
+//Vec2(200*4, 215*4),
+//Vec2(242*4, 90*4),
+//Vec2(261*4, 210*4),
+//Vec2(1738, 970),
+//// 添加更多路径点...
+//    };
+//
+//      Barrier* barrier1 = Barrier::create("Barrier1.png", 100, 100);
+//      barrier1->setPosition(path[0]);
+//      addChild(barrier1);
+//
+//      Barrier* barrier2 = Barrier::create("Barrier1.png", 100, 100);
+//      barrier2->setPosition(path[1]);
+//      addChild(barrier2);
+//
+//
+//      Barrier* barrier3 = Barrier::create("Barrier2.png", 100, 100);
+//      barrier3->setPosition(path[2]);
+//      addChild(barrier3);
+//
+//      Barrier* barrier4 = Barrier::create("Barrier3.png", 100, 100);
+//      barrier4->setPosition(path[3]);
+//      addChild(barrier4);
+//
+//      Barrier* barrier5 = Barrier::create("Barrier4.png", 100, 100);
+//      barrier5->setPosition(path[4]);
+//      addChild(barrier5);
+//
+//      Barrier* barrier6 = Barrier::create("Barrier3.png", 100, 100);
+//      barrier6->setPosition(path[5]);
+//      addChild(barrier6);
+//
+//}
