@@ -4,11 +4,13 @@
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
 #include"carrot.h"
+#include"Bullet.h"
 #include<vector>
+#include"Coin.h"
 #include"Monster.h"
 #include <cstdlib>  // 包含随机数函数的头文件
 #include <ctime>    // 包含时间函数的头文件
-
+#include"Barrier.h"
 USING_NS_CC;
 
 
@@ -29,6 +31,7 @@ static void problemLoading(const char* filename)
 /*********************************************************************初始化第一个地图场景**********************************************************/
 bool SecondScene::init()
 {
+    if(1){
     //////////////////////////////
     // 1. super init first
     if (!Scene::init()) {
@@ -63,7 +66,7 @@ bool SecondScene::init()
     else
     {
         // 将场景图片定位在屏幕中央
-        road->setPosition(Vec2(visibleSize.width / 2 + origin.x,500));
+        road->setPosition(Vec2(visibleSize.width / 2 + origin.x, 500));
 
         // 将场景图片添加为此层的子节点
         this->addChild(road, 0);
@@ -76,7 +79,7 @@ bool SecondScene::init()
     else
     {
         // 将场景图片定位在屏幕中央
-        menubg->setPosition(Vec2(visibleSize.width / 2 + origin.x-70, 1250));
+        menubg->setPosition(Vec2(visibleSize.width / 2 + origin.x - 70, 1250));
 
         // 将场景图片添加为此层的子节点
         this->addChild(menubg, 0);
@@ -161,26 +164,25 @@ bool SecondScene::init()
         }
 
     }
-    /******************************************************************创建萝卜****************************************************/
-    auto carrot = Carrot::createSprite(1775,995);
-    addChild(carrot);
-    
-    /************************************************************************创建怪物精灵***********************************************************************/
-     std::vector<Vec2> path = {
-    Vec2(230, 470),
-    Vec2(715, 470),
-    Vec2(715, 620),
-    Vec2(1230, 620),
-    Vec2(1230, 470),
-    Vec2(1738, 470),
-    Vec2(1738, 970),
-    // 添加更多路径点...
-     };
 
-        Monster* monster = Monster::create(50.0f, 100, "monster0.png", 20, 50,path);
-        monster->setPosition(Vec2(230, 970));
-        addChild(monster);
+
+}
+    /******************************************************************创建萝卜****************************************************/
+    auto carrot = Carrot::createSprite(1775, 995);
+    carrot->setTag(1);
+    addChild(carrot);
+
+    /************************************************************************创建怪物精灵***********************************************************************/
+    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster0), 4.0f, 7, 0);
+    /************************************************************************创建障碍物***********************************************************************/
+  scheduleOnce(CC_SCHEDULE_SELECTOR(SecondScene::createBarriers), 0.0f);
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*********************************************************************创建金币系统**********************************************************/
+    auto coin = Coin::create();
+    coin->setTag(1001); // 设置独特的标签
+    addChild(coin);
+
     return true;
 
 }
@@ -206,5 +208,63 @@ void SecondScene::MusicControl(Ref* sender)
         CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
         Musiccontrol++;
     }
+
+}
+void SecondScene::createAndMoveMonster0(float dt)
+{
+    std::vector<Vec2> path = {
+   Vec2(230, 470),
+   Vec2(715, 470),
+   Vec2(715, 620),
+   Vec2(1230, 620),
+   Vec2(1230, 470),
+   Vec2(1738, 470),
+   Vec2(1738, 970),
+   // 添加更多路径点...
+    };
+
+    //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+    Monster* monster = Monster::create(300.0f, 100, "monster0.png", 20, 100, path);
+    monster->setPosition(Vec2(230, 970));
+    addChild(monster);
+}
+void SecondScene::createBarriers(float dt)
+{
+
+  std::vector<Vec2> path = {
+Vec2(117*4, 172*4),
+Vec2(152*4,172 * 4),
+Vec2(120*4, 234*4),
+Vec2(200*4, 215*4),
+Vec2(242*4, 90*4),
+Vec2(261*4, 210*4),
+Vec2(1738, 970),
+// 添加更多路径点...
+    };
+
+      Barrier* barrier1 = Barrier::create("Barrier1.png", 100, 100);
+      barrier1->setPosition(path[0]);
+      addChild(barrier1);
+
+      Barrier* barrier2 = Barrier::create("Barrier1.png", 100, 100);
+      barrier2->setPosition(path[1]);
+      addChild(barrier2);
+
+
+      Barrier* barrier3 = Barrier::create("Barrier2.png", 100, 100);
+      barrier3->setPosition(path[2]);
+      addChild(barrier3);
+
+      Barrier* barrier4 = Barrier::create("Barrier3.png", 100, 100);
+      barrier4->setPosition(path[3]);
+      addChild(barrier4);
+
+      Barrier* barrier5 = Barrier::create("Barrier4.png", 100, 100);
+      barrier5->setPosition(path[4]);
+      addChild(barrier5);
+
+      Barrier* barrier6 = Barrier::create("Barrier3.png", 100, 100);
+      barrier6->setPosition(path[5]);
+      addChild(barrier6);
 
 }
