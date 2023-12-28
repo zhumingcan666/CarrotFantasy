@@ -11,6 +11,7 @@
 #include <cstdlib>  // 包含随机数函数的头文件
 #include <ctime>    // 包含时间函数的头文件
 #include"Barrier.h"
+
 USING_NS_CC;
 
 
@@ -174,6 +175,7 @@ bool SecondScene::init()
 
     /************************************************************************创建怪物精灵***********************************************************************/
     schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster0), 4.0f, 7, 0);
+
     /************************************************************************创建障碍物***********************************************************************/
   scheduleOnce(CC_SCHEDULE_SELECTOR(SecondScene::createBarriers), 0.0f);
 
@@ -219,7 +221,7 @@ void SecondScene::createAndMoveMonster0(float dt)
    Vec2(1230, 620),
    Vec2(1230, 470),
    Vec2(1738, 470),
-   Vec2(1738, 970),
+   Vec2(1738, 920),
    // 添加更多路径点...
     };
 
@@ -267,4 +269,6 @@ Vec2(1738, 970),
       barrier6->setPosition(path[5]);
       addChild(barrier6);
 
+      levelSelect::thirdScene = 1;
+      saveGameProgress(levelSelect::thirdScene);
 }

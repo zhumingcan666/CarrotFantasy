@@ -7,6 +7,16 @@
 #include <ctime>    // 包含时间函数的头文件
 
 USING_NS_CC;
+
+
+
+//初始定义为0，表示第二关不可选中
+namespace levelSelect {
+   bool thirdScene=0;
+}
+
+
+
 /*********************************************************************创建关卡选择界面**********************************************************/
 Scene* LevelSelectScene::createScene()
 {
@@ -29,6 +39,8 @@ bool LevelSelectScene::init()
         return false;
     }
 
+    loadGameProgress(levelSelect::thirdScene);
+
     // 获取屏幕可见尺寸
     auto visibleSize = Director::getInstance()->getVisibleSize();
     // 获取屏幕原点坐标
@@ -50,13 +62,21 @@ bool LevelSelectScene::init()
     }
     /**********************************************************************放置关卡卡片，并设置丝滑移动动画效果****************************************************/
     // 添加关卡卡片
-    for (int i = 0; i < 2; ++i)
-    {
-        auto levelCard = Sprite::create(StringUtils::format("level_card_%d.png", i + 1));
-        levelCard->setPosition(Vec2(500 + i * 900, 600));
-        addChild(levelCard);
-        levelCards.push_back(levelCard);
-    }
+        auto levelCard1 = Sprite::create(StringUtils::format("level_card_%d.png", 1));
+        levelCard1->setPosition(Vec2(500 + 0* 900, 600));
+        addChild(levelCard1);
+        levelCards.push_back(levelCard1);
+
+
+        auto levelCard2 = Sprite::create(StringUtils::format("level_card_%d.png", 2));
+        levelCard2->setPosition(Vec2(500 + 1* 900, 600));
+        addChild(levelCard2);
+        levelCards.push_back(levelCard2);
+        Sprite* block = Sprite::create("block.png");
+        block->setPosition(levelCard2->getPosition());
+        addChild(block);
+        block->setVisible(!levelSelect::thirdScene);
+
 
     // 添加触摸事件监听器
     auto listener = EventListenerTouchOneByOne::create();
@@ -92,14 +112,15 @@ bool LevelSelectScene::init()
                 }
                 else if (clickedIndex == 1)
                 {
-                    auto thirdScene = ThirdScene::create();
-                    Director::getInstance()->replaceScene(thirdScene);
+                    if (levelSelect::thirdScene) {
+                        auto thirdScene = ThirdScene::create();
+                        Director::getInstance()->replaceScene(thirdScene);
+                    }
                 }
             }
             // 否则，是长击，不做处理
         }
     };
-
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     return true;
@@ -122,4 +143,3 @@ void LevelSelectScene::changeLevel(int direction)
         card->runAction(MoveTo::create(0.5f, targetPos));
     }
 }
-
