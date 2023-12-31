@@ -3,7 +3,8 @@
 #include"Monster.h"
 #include"Tower2.h"
 #include"Tower3.h"
-//#include"coin.h"
+#include"carrot.h"
+#include"coin.h"
 USING_NS_CC;
 
 
@@ -53,7 +54,8 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
     bool is_TouchOnTower = isTouchOnTower(m_lastTouchPos);//判断触摸点上是否有Tower1
     bool is_TouchOnTower2 = isTouchOnTower2(m_lastTouchPos);//判断触摸点上是否有Tower2
     bool is_TouchOnTower3 = isTouchOnTower3(m_lastTouchPos);//判断触摸点上是否有Tower3
-    if (!is_TouchOnTower&&!is_TouchOnTower2&&!is_TouchOnTower3) {
+    bool is_TouchOnTower4 = isTouchOnTower4(m_lastTouchPos);//判断触摸点上是否有carrot萝卜
+    if (!is_TouchOnTower&&!is_TouchOnTower2&&!is_TouchOnTower3&&!is_TouchOnTower4) {
         Rect allowedRect(100, 100, 200, 200);
         Rect forbiddenRect1(150, 300, 200, 1200);
         Rect forbiddenRect2(350, 300, 450, 200);
@@ -69,6 +71,28 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
             showSelectionIcon(m_lastTouchPos);
             // 创建一个新的 MenuItemImage 对象
             auto menuItem = MenuItemImage::create("Bottle01.png", "Bottle01.png","Bottle00.png", CC_CALLBACK_1(Tower::onMenuItemClicked, this));
+            // 获取当前节点所在的场景
+            cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+            if (scene)
+            {
+                // 获取场景中的所有子节点
+                Vector<Node*> children = scene->getChildren();
+
+                // 遍历子节点
+                for (Node* child : children)
+                {
+                    // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+                    Coin* coin = dynamic_cast<Coin*>(child);
+                    if (coin)
+                    {
+                        if (coin->coinCount < 100)
+                        {
+                            menuItem->setEnabled(false);  // 初始设置为不可选中状态
+                        }
+                    }
+                }
+            }
             menuItem->setName("MenuItem"); // 设置菜单项的名称
             // 创建一个菜单，并将 MenuItemImage 添加到菜单中
             auto menu = Menu::create(menuItem, nullptr);
@@ -76,9 +100,30 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
             menu->setName("menu"); // 设置菜单的名称
             // 将菜单添加到场景中
             this->getParent()->addChild(menu);
-
             //创建一个新的 MenuItemImage 对象
-            auto menuItem2 = MenuItemImage::create("Fan01.png", "Fan01.png", CC_CALLBACK_1(Tower::onMenuItemClicked2, this));
+            auto menuItem2 = MenuItemImage::create("Fan01.png", "Fan01.png", "Fan00.png",CC_CALLBACK_1(Tower::onMenuItemClicked2, this));
+            // 获取当前节点所在的场景
+            cocos2d::Scene* scene2 = Director::getInstance()->getRunningScene();
+
+            if (scene2)
+            {
+                // 获取场景中的所有子节点
+                Vector<Node*> children = scene->getChildren();
+
+                // 遍历子节点
+                for (Node* child : children)
+                {
+                    // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+                    Coin* coin = dynamic_cast<Coin*>(child);
+                    if (coin)
+                    {
+                        if (coin->coinCount < 160)
+                        {
+                            menuItem2->setEnabled(false);  // 初始设置为不可选中状态
+                        }
+                    }
+                }
+            }
             menuItem2->setName("MenuItem2"); // 设置菜单项的名称
             // 创建一个菜单，并将 MenuItemImage 添加到菜单中
             auto menu2 = Menu::create(menuItem2, nullptr);
@@ -87,7 +132,29 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
             // 将菜单添加到场景中
             this->getParent()->addChild(menu2);
             //创建一个新的 MenuItemImage 对象
-            auto menuItem3 = MenuItemImage::create("Pin01.png", "Pin01.png", CC_CALLBACK_1(Tower::onMenuItemClicked7, this));
+            auto menuItem3 = MenuItemImage::create("Pin01.png", "Pin01.png", "Pin00.png",CC_CALLBACK_1(Tower::onMenuItemClicked7, this));
+            // 获取当前节点所在的场景
+            cocos2d::Scene* scene3 = Director::getInstance()->getRunningScene();
+
+            if (scene)
+            {
+                // 获取场景中的所有子节点
+                Vector<Node*> children = scene->getChildren();
+
+                // 遍历子节点
+                for (Node* child : children)
+                {
+                    // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+                    Coin* coin = dynamic_cast<Coin*>(child);
+                    if (coin)
+                    {
+                        if (coin->coinCount < 160)
+                        {
+                            menuItem3->setEnabled(false);  // 初始设置为不可选中状态
+                        }
+                    }
+                }
+            }
             menuItem3->setName("MenuItem3"); // 设置菜单项的名称
             // 创建一个菜单，并将 MenuItemImage 添加到菜单中
             auto menu7 = Menu::create(menuItem3, nullptr);
@@ -108,7 +175,29 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
         // 创建一个菜单，并将 DeleteItem 添加到菜单中
         auto menu3 = Menu::create(deleteItem, nullptr);
         //升级按钮
-        auto upgradeItem = MenuItemImage::create("upgrade_180.png.png", "upgrade_180.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked5, this));
+        auto upgradeItem = MenuItemImage::create("upgrade_180.png.png", "upgrade_180.png.png","upgrade_-180.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked5, this));
+        // 获取当前节点所在的场景
+        cocos2d::Scene* scene4 = Director::getInstance()->getRunningScene();
+
+        if (scene4)
+        {
+            // 获取场景中的所有子节点
+            Vector<Node*> children = scene4->getChildren();
+
+            // 遍历子节点
+            for (Node* child : children)
+            {
+                // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+                Coin* coin = dynamic_cast<Coin*>(child);
+                if (coin)
+                {
+                    if (coin->coinCount < 180)
+                    {
+                        upgradeItem->setEnabled(false);  // 初始设置为不可选中状态
+                    }
+                }
+            }
+        }
         upgradeItem->setName("UpgradeItem"); // 设置菜单项的名称
         // 创建一个菜单，并将 UpgradeItem 添加到菜单中
         auto menu5 = Menu::create(upgradeItem, nullptr);
@@ -151,12 +240,34 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
     {
         removeTowerButton();
         // 创建一个新的 MenuItemImage 对象
-        auto deleteItem2 = MenuItemImage::create("sell_80.png.png", "sell_80.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked4, this));
+        auto deleteItem2 = MenuItemImage::create("sell_96.png.png", "sell_96.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked4, this));
         deleteItem2->setName("DeleteItem"); // 设置菜单项的名称
         // 创建一个菜单，并将 DeleteItem 添加到菜单中
         auto menu4 = Menu::create(deleteItem2, nullptr);
         //升级按钮
-        auto upgradeItem2 = MenuItemImage::create("upgrade_180.png.png", "upgrade_180.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked6, this));
+        auto upgradeItem2 = MenuItemImage::create("upgrade_220.png.png", "upgrade_220.png.png", "upgrade_-220.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked6, this));
+        // 获取当前节点所在的场景
+        cocos2d::Scene* scene5 = Director::getInstance()->getRunningScene();
+
+        if (scene5)
+        {
+            // 获取场景中的所有子节点
+            Vector<Node*> children = scene5->getChildren();
+
+            // 遍历子节点
+            for (Node* child : children)
+            {
+                // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+                Coin* coin = dynamic_cast<Coin*>(child);
+                if (coin)
+                {
+                    if (coin->coinCount < 220)
+                    {
+                        upgradeItem2->setEnabled(false);  // 初始设置为不可选中状态
+                    }
+                }
+            }
+        }
         upgradeItem2->setName("UpgradeItem2"); // 设置菜单项的名称
         // 创建一个菜单，并将 UpgradeItem2 添加到菜单中
         auto menu6 = Menu::create(upgradeItem2, nullptr);
@@ -200,12 +311,32 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
         removeTowerButton();
         //删掉按钮
         // 创建一个新的 MenuItemImage 对象
-        auto deleteItem3 = MenuItemImage::create("sell_80.png.png", "sell_80.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked8, this));
+        auto deleteItem3 = MenuItemImage::create("sell_128.png.png", "sell_128.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked8, this));
         deleteItem3->setName("DeleteItem3"); // 设置菜单项的名称
         // 创建一个菜单，并将 DeleteItem 添加到菜单中
         auto menu7 = Menu::create(deleteItem3, nullptr);
         //升级按钮
-        auto upgradeItem3 = MenuItemImage::create("upgrade_180.png.png", "upgrade_180.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked9, this));
+        auto upgradeItem3 = MenuItemImage::create("upgrade_220.png.png", "upgrade_220.png.png","upgrade_-220.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked9, this));
+        cocos2d::Scene* scene6 = Director::getInstance()->getRunningScene();
+        if (scene6)
+        {
+            // 获取场景中的所有子节点
+            Vector<Node*> children = scene6->getChildren();
+
+            // 遍历子节点
+            for (Node* child : children)
+            {
+                // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+                Coin* coin = dynamic_cast<Coin*>(child);
+                if (coin)
+                {
+                    if (coin->coinCount < 220)
+                    {
+                        upgradeItem3->setEnabled(false);  // 初始设置为不可选中状态
+                    }
+                }
+            }
+        }
         upgradeItem3->setName("UpgradeItem3"); // 设置菜单项的名称
         // 创建一个菜单，并将 UpgradeItem 添加到菜单中
         auto menu8 = Menu::create(upgradeItem3, nullptr);
@@ -243,6 +374,20 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
             // 将菜单添加到场景中
             this->getParent()->addChild(menu8);
         }
+        }
+    else if (is_TouchOnTower4)
+    {
+        removeTowerButton();
+        //萝卜升级按钮
+        auto upgradeItem4 = MenuItemImage::create("upgrade_220.png.png", "upgrade_220.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked10, this));
+        upgradeItem4->setName("UpgradeItem4"); // 设置菜单项的名称
+        // 创建一个菜单，并将 UpgradeItem4 添加到菜单中
+        auto menu9 = Menu::create(upgradeItem4, nullptr);
+            Vec2 CarrotPos = Vec2(1775, 995);
+            menu9->setPosition(CarrotPos + Vec2(0, 80));
+            menu9->setName("menu9"); // 设置菜单的名称
+            // 将菜单添加到场景中
+            this->getParent()->addChild(menu9);
         }
     return false;
 }
@@ -348,6 +493,16 @@ bool Tower::isTouchOnTower3(const cocos2d::Vec2& touchPos)
     // 触摸点不在任何炮塔范围内
     return false;
 }
+bool Tower::isTouchOnTower4(const cocos2d::Vec2& touchPos)
+{
+    Vec2 CarrotPos = Vec2(1775, 995);
+    if (m_lastTouchPos.getDistance(CarrotPos) < 50.0f) // 调整 50.0f 为适当的触摸范围
+    {
+        return true;
+    }
+    // 触摸点不在任何炮塔范围内
+    return false;
+}
 
 
 
@@ -368,6 +523,7 @@ void Tower::removeTowerButton()
         Menu* existingMenu6 = dynamic_cast<Menu*>(parentNode->getChildByName("menu6"));
         Menu* existingMenu7 = dynamic_cast<Menu*>(parentNode->getChildByName("menu7"));
         Menu* existingMenu8 = dynamic_cast<Menu*>(parentNode->getChildByName("menu8"));
+        Menu* existingMenu9 = dynamic_cast<Menu*>(parentNode->getChildByName("menu9"));
         if (existingMenu)
         {
             existingMenu->removeFromParent();
@@ -408,6 +564,11 @@ void Tower::removeTowerButton()
             existingMenu8->removeFromParent();
             removeSelectionIcon();
         }
+        if (existingMenu9)
+        {
+            existingMenu9->removeFromParent();
+            removeSelectionIcon();
+        }
     }
 }
 
@@ -428,7 +589,25 @@ void Tower::onMenuItemClicked(Ref* sender)
 
     // 将新的 Tower 添加到场景中
     this->getParent()->addChild(tower);
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Coin* coin = dynamic_cast<Coin*>(child);
+            if (coin)
+            {
+                coin->coinCount -= 100;
+            }
+        }
+    }
 }
 //炮塔选择按钮2的回调函数
 void Tower::onMenuItemClicked2(Ref* sender)
@@ -447,6 +626,25 @@ void Tower::onMenuItemClicked2(Ref* sender)
 
     // 将新的 Tower2 添加到场景中
     this->getParent()->addChild(fan);
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Coin* coin = dynamic_cast<Coin*>(child);
+            if (coin)
+            {
+                coin->coinCount -= 160;
+            }
+        }
+    }
 }
 //炮塔选择按钮3的回调函数
 void Tower::onMenuItemClicked7(Ref* sender)
@@ -465,7 +663,25 @@ void Tower::onMenuItemClicked7(Ref* sender)
 
     // 将新的 Tower 添加到场景中
     this->getParent()->addChild(Pin);
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Coin* coin = dynamic_cast<Coin*>(child);
+            if (coin)
+            {
+                coin->coinCount -= 160;
+            }
+        }
+    }
 }
 void Tower::onMenuItemClicked3(Ref* sender)
 {
@@ -479,6 +695,25 @@ void Tower::onMenuItemClicked3(Ref* sender)
     // 移除按钮
     removeTowerButton();
     removeTowerButton();
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Coin* coin = dynamic_cast<Coin*>(child);
+            if (coin)
+            {
+                coin->coinCount += 80;
+            }
+        }
+    }
 }
 void Tower::onMenuItemClicked4(Ref* sender)
 {
@@ -491,6 +726,25 @@ void Tower::onMenuItemClicked4(Ref* sender)
     removeTowerAt2(touchPos); // 将参数改为 touchPos
     // 移除按钮
     removeTowerButton();
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Coin* coin = dynamic_cast<Coin*>(child);
+            if (coin)
+            {
+                coin->coinCount += 96;
+            }
+        }
+    }
 }
 void Tower::onMenuItemClicked8(Ref* sender)
 {
@@ -504,6 +758,25 @@ void Tower::onMenuItemClicked8(Ref* sender)
     // 移除按钮
     removeTowerButton();
     removeTowerButton();
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Coin* coin = dynamic_cast<Coin*>(child);
+            if (coin)
+            {
+                coin->coinCount += 128;
+            }
+        }
+    }
 }
 void Tower::onMenuItemClicked5(Ref* sender)
 {
@@ -516,6 +789,25 @@ void Tower::onMenuItemClicked5(Ref* sender)
     upgradeTower(touchPos);
     // 移除按钮
     removeTowerButton();
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Coin* coin = dynamic_cast<Coin*>(child);
+            if (coin)
+            {
+                coin->coinCount -= 180;
+            }
+        }
+    }
 }
 void Tower::onMenuItemClicked6(Ref* sender)
 {
@@ -538,6 +830,18 @@ void Tower::onMenuItemClicked9(Ref* sender)
     Vec2 touchPos = m_lastTouchPos;
     // 升级炮塔
     upgradeTower3(touchPos);
+    // 移除按钮
+    removeTowerButton();
+}
+void Tower::onMenuItemClicked10(Ref* sender)
+{
+    // 获取点击的菜单项
+    MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
+
+    // 使用保存的触摸点的位置
+    Vec2 touchPos = m_lastTouchPos;
+    // 升级炮塔
+    upgradeCarrot(touchPos);
     // 移除按钮
     removeTowerButton();
 }
@@ -651,6 +955,38 @@ void Tower::upgradeTower3(const cocos2d::Vec2& touchPos)
                         // 这里可以添加其他升级操作，例如扣除资源等
                     }
                     // 在这里可以添加其他升级操作
+                }
+            }
+        }
+    }
+}
+void Tower::upgradeCarrot(const cocos2d::Vec2& touchPos)
+{
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 尝试将节点转换为 Carrot 类型
+            Carrot* carrot = dynamic_cast<Carrot*>(child);
+            if (carrot)
+            {
+                // 获取炮塔的世界坐标
+                Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
+                // 检查触摸点是否在炮塔范围内
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // 调整 50.0f 为适当的触摸范围
+                {// 升级萝卜，但限制最大等级为3
+                    if (carrot->level < 3)
+                    {
+                        carrot->levelUp();
+                    }
+
                 }
             }
         }

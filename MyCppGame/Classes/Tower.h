@@ -15,6 +15,7 @@ public:
     bool isTouchOnTower(const cocos2d::Vec2& touchPos) const;
     bool Tower::isTouchOnTower2(const cocos2d::Vec2& touchPos);
     bool Tower::isTouchOnTower3(const cocos2d::Vec2& touchPos);
+    bool Tower::isTouchOnTower4(const cocos2d::Vec2& touchPos);
 
     //剩下的等怪物和子弹写好
     // 点击事件处理函数
@@ -32,6 +33,7 @@ public:
     void Tower::onMenuItemClicked7(Ref* sender);
     void Tower::onMenuItemClicked8(Ref* sender);
     void Tower::onMenuItemClicked9(Ref* sender);
+    void Tower::onMenuItemClicked10(Ref* sender);
     void Tower::removeTowerAt(const cocos2d::Vec2& touchPos);
     void Tower::removeTowerAt2(const cocos2d::Vec2& touchPos);
     void Tower::removeTowerAt3(const cocos2d::Vec2& touchPos);
@@ -41,6 +43,7 @@ public:
     void Tower::upgradeTower(const cocos2d::Vec2& touchPos);//炮塔升级函数
     void Tower::upgradeTower2(const cocos2d::Vec2& touchPos);
     void Tower::upgradeTower3(const cocos2d::Vec2& touchPos);
+    void Tower::upgradeCarrot(const cocos2d::Vec2& touchPos);//萝卜升级函数
     void Tower::showSelectionIcon(const cocos2d::Vec2& position);//选中图标的创建函数
     void Tower::removeSelectionIcon();//选中图标的移除函数
 
