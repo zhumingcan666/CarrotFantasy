@@ -8,7 +8,7 @@ int Carrot::carrotPositionY = 0;
 int Carrot::carrotHPPositionX = 0;
 int Carrot::carrotHPPositionY = 0;
 
-Sprite* Carrot::createSprite(int x, int y)
+Carrot* Carrot::createSprite(int x, int y)
 {
 	carrotPositionX = x;
 	carrotPositionY = y;
@@ -36,8 +36,9 @@ bool Carrot::init()
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	//初始化私有成员
-	HP = 10;
+	HP = 6;
 	form = 7;
+	level = 1;
 
 	//萝卜相关的贴图初始化
 	auto carrot = Sprite::create("carrotSave.png");//萝卜本体
@@ -51,23 +52,23 @@ bool Carrot::init()
 	carrotCache = SpriteFrameCache::getInstance();//缓存萝卜被啃形态贴图
 	carrotCache->addSpriteFramesWithFile("carrot.plist");
 
-	//HP=10贴图初始化
-	auto initCarrotHPFrame = carrotHPCache->getSpriteFrameByName("carrotHP10.png");//取出HP=10的一帧
+	//HP=6贴图初始化
+	auto initCarrotHPFrame = carrotHPCache->getSpriteFrameByName("carrotHP6.png");//取出HP=10的一帧
 	if (initCarrotHPFrame) {
 		auto sprite = Sprite::createWithSpriteFrame(initCarrotHPFrame);
 		addChild(sprite);
 		sprite->setPosition(Vec2(origin.x + carrotHPPositionX, origin.y + carrotHPPositionY));
 		sprite->setScale(1.5f);
 	}
-	else problemLoading("'carrotHP10.png'");
+	else problemLoading("'carrotHP6.png'");
 
 
 	carrotBoundingBox = Rect(carrot->getPositionX() - carrot->getContentSize().width * 0.5f,
-                             carrot->getPositionY() - carrot->getContentSize().height * 0.5f,
-                             carrot->getContentSize().width,
-                             carrot->getContentSize().height);
+		carrot->getPositionY() - carrot->getContentSize().height * 0.5f,
+		carrot->getContentSize().width,
+		carrot->getContentSize().height);
 
-	schedule(schedule_selector(Carrot::handleMonsterSpriteCollisions),1.0f,CC_REPEAT_FOREVER,1.0f);
+	schedule(schedule_selector(Carrot::handleMonsterSpriteCollisions), 1.0f, CC_REPEAT_FOREVER, 1.0f);
 	return true;
 }
 void Carrot::handleMonsterSpriteCollisions(float dt)
@@ -129,5 +130,50 @@ void Carrot::carrotUpdate()
 			sprite->setScale(1.5f);
 		}
 		else problemLoading(frameName);
+	}
+}
+
+void Carrot::levelUp()
+{
+	//最多升两级
+	if (level == 3) return;
+	//HP回血，等级提升，附加特殊技能
+	HP += 2;
+	level++;
+
+	auto visibleSize = Director::getInstance()->getVisibleSize();//获取屏幕大小
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();// 获取屏幕原点坐标
+
+	//升级后更新HP
+	char frameName[20] = { 0 };
+	sprintf(frameName, "carrotHP%d.png", HP);
+	auto CarrotHPFrame = carrotHPCache->getSpriteFrameByName(frameName);//取出HP对应的一帧
+	if (CarrotHPFrame) {
+		auto sprite = Sprite::createWithSpriteFrame(CarrotHPFrame);
+		addChild(sprite);
+		sprite->setPosition(Vec2(/*origin.x + carrotHPPositionX, origin.y + carrotHPPositionY*/0,0));
+		sprite->setScale(1.5f);
+	}
+	else problemLoading(frameName);
+
+	//提示已升级
+	Node* parent = this->getParent();//获取当前场景并添加提示语
+	if (parent != nullptr)
+	{
+		Sprite* scene = dynamic_cast<Sprite*> (parent);
+		auto label = Label::createWithTTF("萝卜已升级！", "fonts/Impact.ttf", 36);
+		label->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height * (3.0 / 4.0) + origin.y));
+		scene->addChild(label);
+
+		// 创建淡入动作
+		auto fadeIn = FadeIn::create(1.0f);
+		// 创建淡出动作
+		auto fadeOut = FadeOut::create(1.0f);
+		// 创建延迟动作
+		auto delay = DelayTime::create(2.0f);
+		// 创建动作序列，先淡入再延迟，最后淡出
+		auto sequence = Sequence::create(fadeIn, delay, fadeOut, nullptr);
+		// 运行动作序列
+		label->runAction(sequence);
 	}
 }

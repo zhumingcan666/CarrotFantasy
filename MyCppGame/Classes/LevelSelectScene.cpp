@@ -2,6 +2,8 @@
 #include"SecondScene.h"
 #include"ThirdScene.h"
 #include "LevelSelectScene.h"
+#include "SimpleAudioEngine.h"
+#include "ui/CocosGUI.h"
 #include "ui/CocosGUI.h"
 #include <cstdlib>  // 包含随机数函数的头文件
 #include <ctime>    // 包含时间函数的头文件
@@ -38,8 +40,27 @@ bool LevelSelectScene::init()
         // 初始化失败
         return false;
     }
-
+    //获取上次游戏进度
     loadGameProgress(levelSelect::thirdScene);
+    //添加重置关卡按钮
+    auto resetbutton = MenuItemImage::create(
+        "reset1.png",
+        "reset2.png",
+        CC_CALLBACK_1(LevelSelectScene::reset, this));
+    resetbutton->setPosition(1800, 1240);
+    auto menu = Menu::create(resetbutton, NULL);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu, 3);
+
+    auto backhome = MenuItemImage::create(
+        "back.png",
+        "back_pressed.png",
+        CC_CALLBACK_1(LevelSelectScene::backHome, this));
+    backhome->setPosition(30, 1250);
+    auto menu1 = Menu::create(backhome, NULL);
+    menu1->setPosition(Vec2::ZERO);
+    this->addChild(menu1, 3);
+
 
     // 获取屏幕可见尺寸
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -142,4 +163,18 @@ void LevelSelectScene::changeLevel(int direction)
     {
         card->runAction(MoveTo::create(0.5f, targetPos));
     }
+}
+//重置选择
+void LevelSelectScene::reset(Ref* sender)
+{
+    levelSelect::thirdScene = 0;
+    saveGameProgress(levelSelect::thirdScene);
+    auto levelSelectScene = LevelSelectScene::create();
+    Director::getInstance()->replaceScene(levelSelectScene);
+}
+void LevelSelectScene::backHome(Ref* sender)
+{
+    auto home = HelloWorld::create();
+    Director::getInstance()->replaceScene(home);
+
 }

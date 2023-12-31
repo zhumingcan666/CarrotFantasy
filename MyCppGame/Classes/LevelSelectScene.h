@@ -7,8 +7,7 @@
 #include <fstream>
 
 
-
-//用全局变量实现
+//用全局变量实现保存关卡
 namespace levelSelect {
     extern bool thirdScene;
 }
@@ -22,8 +21,6 @@ public:
     cocos2d::Vec2 touchStartPos;
     void changeLevel(int direction); // 移除了 "LevelSelectScene::"
     const float minSwipeDistance = 50.0f;
-
-
 
 
 
@@ -57,17 +54,10 @@ public:
         }
     }
 
-    void firstWrite(float dt) {
-        saveGameProgress(0);
-    }
 
-
-
-
+    void reset(Ref* sender);
+    void backHome(Ref* sender);
     CREATE_FUNC(LevelSelectScene);
-
-
-
 
 };
 

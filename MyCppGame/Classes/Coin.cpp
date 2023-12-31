@@ -16,7 +16,7 @@ bool Coin::init()
     }
 
     coinLabel = Label::createWithTTF("Coins: 0", "fonts/Marker Felt.ttf", 36);
-    coinLabel->setPosition(Vec2(200, 1200));
+    coinLabel->setPosition(Vec2(300, 1250));
     this->addChild(coinLabel);
 
     schedule(CC_SCHEDULE_SELECTOR(Coin::updateCoinLabel));

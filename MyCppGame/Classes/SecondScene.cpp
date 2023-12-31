@@ -5,17 +5,16 @@
 #include "SimpleAudioEngine.h"
 #include"carrot.h"
 #include"Bullet.h"
+#include"Tower.h"
+#include"Tower2.h"
 #include<vector>
+#include"LevelSelectScene.h"
 #include"Coin.h"
 #include"Monster.h"
 #include <cstdlib>  // 包含随机数函数的头文件
 #include <ctime>    // 包含时间函数的头文件
-#include"Barrier.h"
 
 USING_NS_CC;
-
-
-
 
 /*********************************************************************创建第一个地图场景**********************************************************/
 Scene* SecondScene::createScene()
@@ -32,6 +31,9 @@ static void problemLoading(const char* filename)
 /*********************************************************************初始化第一个地图场景**********************************************************/
 bool SecondScene::init()
 {
+
+
+    //////////////////////////////////////////////////该if(1)中是各种按钮的实现
     if(1){
     //////////////////////////////
     // 1. super init first
@@ -59,19 +61,10 @@ bool SecondScene::init()
         // 将场景图片添加为此层的子节点
         this->addChild(sprite, 0);
     }
-    auto road = Sprite::create("road1.png");
-    if (road == nullptr)
-    {
-        problemLoading("'road1.png'");
-    }
-    else
-    {
-        // 将场景图片定位在屏幕中央
+       auto road = Sprite::create("road1.png");
         road->setPosition(Vec2(visibleSize.width / 2 + origin.x, 500));
-
         // 将场景图片添加为此层的子节点
         this->addChild(road, 0);
-    }
     auto menubg = Sprite::create("menubg(1).png");
     if (menubg == nullptr)
     {
@@ -87,10 +80,11 @@ bool SecondScene::init()
     }
     /*********************************************************************创建一个返回主菜单按钮（homeItem)**********************************************************/
     if (1) {
+        //回到选择页面
         auto homeItem = MenuItemImage::create(
             "back.png",
             "back_pressed.png",
-            CC_CALLBACK_1(SecondScene::menuBackHome, this));
+            CC_CALLBACK_1(SecondScene::menuBack, this));
 
         // 检查图标是否加载成功，若未加载成功，则输出问题信息
         if (homeItem == nullptr ||
@@ -110,9 +104,19 @@ bool SecondScene::init()
 
 
         // 创建菜单，这是一个自动释放的对象
+        //回到主页面
         auto menu = Menu::create(homeItem, NULL);
         menu->setPosition(Vec2::ZERO);
         this->addChild(menu, 1);
+
+        auto backhome = MenuItemImage::create(
+            "return1.png",
+            "return.png",
+            CC_CALLBACK_1(SecondScene::menuBackHome, this));
+        backhome->setPosition(1700, 1250);
+        auto menu1 = Menu::create(backhome, NULL);
+        menu1->setPosition(Vec2::ZERO);
+        this->addChild(menu1, 3);
 
     }
     /*********************************************************************创建第一个地图的音乐**********************************************************/
@@ -167,33 +171,74 @@ bool SecondScene::init()
     }
 
 
-}
+   }
+   //////////////////////////////////////////////////以上为按钮实现
+
+
+    /******************************************************************加速****************************************************/
+
+   auto speed = MenuItemImage::create(
+       "speedup.png",
+       "speedup1.png",
+       CC_CALLBACK_1(SecondScene::speedUp, this));
+   speed->setPosition(1500, 1250);
+   auto menus = Menu::create(speed, NULL);
+   menus->setPosition(Vec2::ZERO);
+   this->addChild(menus, 3);
+   /******************************************************************暂停****************************************************/
+
+   auto stop = MenuItemImage::create(
+       "stop.png",
+       "stop1.png",
+       CC_CALLBACK_1(SecondScene::stopORstart, this));
+   stop->setPosition(1400, 1250);
+   auto menust = Menu::create(stop, NULL);
+   menust->setPosition(Vec2::ZERO);
+   this->addChild(menust, 3);
+
+
+   /******************************************************************炮塔实现****************************************************/
+   Tower* tower = Tower::createTower("Bottle11.png");
+   tower->setTag(10);
+   this->addChild(tower);
+   Tower2* fan = Tower2::createTower("Fan11.png");
+   this->addChild(fan);
+
+    /******************************************************************开场倒计时****************************************************/
+
+   schedule(CC_SCHEDULE_SELECTOR(SecondScene::countDown), 0.8f, 2, 0);
+
+
     /******************************************************************创建萝卜****************************************************/
     auto carrot = Carrot::createSprite(1775, 995);
-    carrot->setTag(1);
     addChild(carrot);
 
     /************************************************************************创建怪物精灵***********************************************************************/
-    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster0), 4.0f, 7, 0);
 
-    /************************************************************************创建障碍物***********************************************************************/
-  scheduleOnce(CC_SCHEDULE_SELECTOR(SecondScene::createBarriers), 0.0f);
+    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster1), 3.50f);
 
+    /************************************************************************判断胜利***********************************************************************/
+    this->schedule(CC_SCHEDULE_SELECTOR(SecondScene::checkWin));
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*********************************************************************创建金币系统**********************************************************/
     auto coin = Coin::create();
     coin->setTag(1001); // 设置独特的标签
     addChild(coin);
-
     return true;
 
 }
 /************************************************************************返回主菜单按钮的回调函数**********************************************************/
+void SecondScene::menuBack(Ref* pSender)
+{
+    auto levelSelectScene = LevelSelectScene::create();
+    Director::getInstance()->replaceScene(levelSelectScene);
+}
 void SecondScene::menuBackHome(Ref* pSender)
 {
-    auto helloWorld = HelloWorld::create();
-    Director::getInstance()->replaceScene(helloWorld);
+    auto home = HelloWorld::create();
+    Director::getInstance()->replaceScene(home);
 }
+
 /***********************************************************************控制背景音乐的回调函数***************************************************************/
 void SecondScene::MusicControl(Ref* sender)
 {
@@ -212,63 +257,188 @@ void SecondScene::MusicControl(Ref* sender)
     }
 
 }
-void SecondScene::createAndMoveMonster0(float dt)
+void SecondScene::countDown(float dt)
+{
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    // 获取屏幕原点坐标
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+        auto levelCard3 = Sprite::create(StringUtils::format("countdown%d.png", countdown));
+        levelCard3->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+        addChild(levelCard3, 3);
+     --countdown; 
+     // 创建延迟动作，1秒后执行删除动作
+     auto delayAction = DelayTime::create(0.85f);
+     auto removeAction = RemoveSelf::create();
+     auto sequenceAction = Sequence::create(delayAction, removeAction, nullptr);
+     levelCard3->runAction(sequenceAction);
+}
+void  SecondScene::speedUp(Ref* pSender)
+{
+    ++speedCount;
+    stopCount = 3;
+    if(speedCount%2==0)
+        Director::getInstance()->getScheduler()->setTimeScale(2.0f);
+    else
+        Director::getInstance()->getScheduler()->setTimeScale(1.0f);
+}
+void SecondScene::stopORstart(Ref* sender)
+{
+      ++stopCount;
+      if (stopCount % 2 == 0)
+      {
+          Director::getInstance()->getScheduler()->setTimeScale(0.0f);
+          speedCount = 2;
+
+      }
+    else {
+        speedCount = 3;
+        Director::getInstance()->getScheduler()->setTimeScale(1.0f);
+
+    }
+}
+void SecondScene::createAndMoveMonster1(float dt)
 {
     std::vector<Vec2> path = {
-   Vec2(230, 470),
-   Vec2(715, 470),
-   Vec2(715, 620),
-   Vec2(1230, 620),
-   Vec2(1230, 470),
-   Vec2(1738, 470),
-   Vec2(1738, 920),
-   // 添加更多路径点...
-    };
-
-    //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-    Monster* monster = Monster::create(300.0f, 100, "monster0.png", 20, 100, path);
-    monster->setPosition(Vec2(230, 970));
-    addChild(monster);
-}
-void SecondScene::createBarriers(float dt)
-{
-
-  std::vector<Vec2> path = {
-Vec2(117*4, 172*4),
-Vec2(152*4,172 * 4),
-Vec2(120*4, 234*4),
-Vec2(200*4, 215*4),
-Vec2(242*4, 90*4),
-Vec2(261*4, 210*4),
-Vec2(1738, 970),
+Vec2(230, 470),
+Vec2(715, 470),
+Vec2(715, 620),
+Vec2(1230, 620),
+Vec2(1230, 470),
+Vec2(1738, 470),
+Vec2(1738, 920),
 // 添加更多路径点...
     };
+    //第一波有八只怪物
+    if (round == 1) {
+        ++round1_;
+        //第一种怪物
+        if (round1_ % 3 == 0) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster0.png", 110, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
+        if (round1_ % 3 == 1) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster1.png", 100, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
+        if (round1_ % 3 == 2) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster2.png", 110, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
 
-      Barrier* barrier1 = Barrier::create("Barrier1.png", 100, 100);
-      barrier1->setPosition(path[0]);
-      addChild(barrier1);
+        if (round1_ == 10)
+        {
+            round = 2;
+            auto schedulerCallback = [=](float dt) {
+                createAndMoveMonster2(dt);
 
-      Barrier* barrier2 = Barrier::create("Barrier1.png", 100, 100);
-      barrier2->setPosition(path[1]);
-      addChild(barrier2);
+                // 延迟 7 秒后执行下一次调度
+                this->schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster2), 4.0f);
+                };
+
+            // 延迟 7 秒后执行第一次调度
+            this->scheduleOnce(schedulerCallback, 40.0f,"  ");
+        }
+    }
+}
+void SecondScene::createAndMoveMonster2(float dt)
+{
+    std::vector<Vec2> path = {
+Vec2(230, 470),
+Vec2(715, 470),
+Vec2(715, 620),
+Vec2(1230, 620),
+Vec2(1230, 470),
+Vec2(1738, 470),
+Vec2(1738, 920),
+// 添加更多路径点...
+    };
+    //第一波有八只怪物
+    if (round == 2) {
+        ++round2_;
+        //第一种怪物
+        if (round2_ % 3 == 0) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster0.png", 110, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
+        if (round2_ % 3 == 1) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster1.png", 100, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
+        if (round2_ % 3 == 2) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster2.png", 110, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
+
+        if (round2_ == 16)
+        {
+            round = 3;
+            auto schedulerCallback = [=](float dt) {
+                createAndMoveMonster2(dt);
+
+                // 延迟 7 秒后执行下一次调度
+                this->schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster3), 4.0f);
+                };
+
+            // 延迟 7 秒后执行第一次调度
+            this->scheduleOnce(schedulerCallback, 20.0f, "  ");
+
+        }
+    }
 
 
-      Barrier* barrier3 = Barrier::create("Barrier2.png", 100, 100);
-      barrier3->setPosition(path[2]);
-      addChild(barrier3);
+}
+void SecondScene::createAndMoveMonster3(float dt)
+{
+    std::vector<Vec2> path = {
+Vec2(230, 470),
+Vec2(715, 470),
+Vec2(715, 620),
+Vec2(1230, 620),
+Vec2(1230, 470),
+Vec2(1738, 470),
+Vec2(1738, 920),
+// 添加更多路径点...
+    };
+    //第一波有八只怪物
+    if (round == 3) {
+        ++round3_;
+        //第一种怪物
+        if (round3_ % 3 == 0) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster0.png", 110, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
+        if (round3_ % 3 == 1) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster1.png", 100, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
+        if (round3_ % 3 == 2) {
+            //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
+            Monster* monster = Monster::create(50.0f, 100, "monster2.png", 110, 100, path);
+            monster->setPosition(Vec2(230, 970));
+            addChild(monster);
+        }
 
-      Barrier* barrier4 = Barrier::create("Barrier3.png", 100, 100);
-      barrier4->setPosition(path[3]);
-      addChild(barrier4);
+        if (round3_ == 20)
+        {
+            round = 4;
+        }
+    }
 
-      Barrier* barrier5 = Barrier::create("Barrier4.png", 100, 100);
-      barrier5->setPosition(path[4]);
-      addChild(barrier5);
 
-      Barrier* barrier6 = Barrier::create("Barrier3.png", 100, 100);
-      barrier6->setPosition(path[5]);
-      addChild(barrier6);
-
-      levelSelect::thirdScene = 1;
-      saveGameProgress(levelSelect::thirdScene);
 }
