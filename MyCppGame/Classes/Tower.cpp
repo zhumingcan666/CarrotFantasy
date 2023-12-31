@@ -2,7 +2,8 @@
 #include"SecondScene.h"
 #include"Monster.h"
 #include"Tower2.h"
-#include"coin.h"
+#include"Tower3.h"
+//#include"coin.h"
 USING_NS_CC;
 
 
@@ -51,7 +52,8 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
 
     bool is_TouchOnTower = isTouchOnTower(m_lastTouchPos);//判断触摸点上是否有Tower1
     bool is_TouchOnTower2 = isTouchOnTower2(m_lastTouchPos);//判断触摸点上是否有Tower2
-    if (!is_TouchOnTower&&!is_TouchOnTower2) {
+    bool is_TouchOnTower3 = isTouchOnTower3(m_lastTouchPos);//判断触摸点上是否有Tower3
+    if (!is_TouchOnTower&&!is_TouchOnTower2&&!is_TouchOnTower3) {
         Rect allowedRect(100, 100, 200, 200);
         Rect forbiddenRect1(150, 300, 200, 1200);
         Rect forbiddenRect2(350, 300, 450, 200);
@@ -70,7 +72,7 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
             menuItem->setName("MenuItem"); // 设置菜单项的名称
             // 创建一个菜单，并将 MenuItemImage 添加到菜单中
             auto menu = Menu::create(menuItem, nullptr);
-            menu->setPosition(m_lastTouchPos + Vec2(-40, 70));
+            menu->setPosition(m_lastTouchPos + Vec2(-60, 70));
             menu->setName("menu"); // 设置菜单的名称
             // 将菜单添加到场景中
             this->getParent()->addChild(menu);
@@ -80,10 +82,19 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
             menuItem2->setName("MenuItem2"); // 设置菜单项的名称
             // 创建一个菜单，并将 MenuItemImage 添加到菜单中
             auto menu2 = Menu::create(menuItem2, nullptr);
-            menu2->setPosition(m_lastTouchPos + Vec2(30, 70));
+            menu2->setPosition(m_lastTouchPos + Vec2(10, 70));
             menu2->setName("menu2"); // 设置菜单的名称
             // 将菜单添加到场景中
             this->getParent()->addChild(menu2);
+            //创建一个新的 MenuItemImage 对象
+            auto menuItem3 = MenuItemImage::create("Pin01.png", "Pin01.png", CC_CALLBACK_1(Tower::onMenuItemClicked7, this));
+            menuItem3->setName("MenuItem3"); // 设置菜单项的名称
+            // 创建一个菜单，并将 MenuItemImage 添加到菜单中
+            auto menu7 = Menu::create(menuItem3, nullptr);
+            menu7->setPosition(m_lastTouchPos + Vec2(80, 70));
+            menu7->setName("menu3"); // 设置菜单的名称
+            // 将菜单添加到场景中
+            this->getParent()->addChild(menu7);
             return true;
         }
     }
@@ -184,6 +195,55 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
             this->getParent()->addChild(menu6);
         }
     }
+    else if (is_TouchOnTower3)
+    {
+        removeTowerButton();
+        //删掉按钮
+        // 创建一个新的 MenuItemImage 对象
+        auto deleteItem3 = MenuItemImage::create("sell_80.png.png", "sell_80.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked8, this));
+        deleteItem3->setName("DeleteItem3"); // 设置菜单项的名称
+        // 创建一个菜单，并将 DeleteItem 添加到菜单中
+        auto menu7 = Menu::create(deleteItem3, nullptr);
+        //升级按钮
+        auto upgradeItem3 = MenuItemImage::create("upgrade_180.png.png", "upgrade_180.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked9, this));
+        upgradeItem3->setName("UpgradeItem3"); // 设置菜单项的名称
+        // 创建一个菜单，并将 UpgradeItem 添加到菜单中
+        auto menu8 = Menu::create(upgradeItem3, nullptr);
+        // 获取当前节点所在的场景
+        cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+        if (scene)
+        {
+            // 获取场景中的所有子节点
+            Vector<Node*> children = scene->getChildren();
+
+            // 遍历子节点
+            for (Node* child : children)
+            {
+                // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+                Tower3* tower3 = dynamic_cast<Tower3*>(child);
+                if (tower3)
+                {
+                    // 获取炮塔的世界坐标
+                    Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
+
+                    // 检查触摸点是否在炮塔范围内
+                    if (m_lastTouchPos.getDistance(towerWorldPos) < 50.0f) // 调整 50.0f 为适当的触摸范围
+                    {
+                        towerposition = tower3->getPosition();
+                    }
+                }
+            }
+            menu7->setPosition(towerposition + Vec2(0, -80));
+            menu7->setName("menu7"); // 设置菜单的名称
+            // 将菜单添加到场景中
+            this->getParent()->addChild(menu7);
+            menu8->setPosition(towerposition + Vec2(0, 80));
+            menu8->setName("menu8"); // 设置菜单的名称
+            // 将菜单添加到场景中
+            this->getParent()->addChild(menu8);
+        }
+        }
     return false;
 }
 //判断炮塔是否在触摸点的函数
@@ -254,6 +314,40 @@ bool Tower::isTouchOnTower2(const cocos2d::Vec2& touchPos)
     // 触摸点不在任何炮塔范围内
     return false;
 }
+bool Tower::isTouchOnTower3(const cocos2d::Vec2& touchPos)
+{
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
+
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Tower3* tower3 = dynamic_cast<Tower3*>(child);
+            if (tower3)
+            {
+                // 获取炮塔的世界坐标
+                Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
+
+                // 检查触摸点是否在炮塔范围内
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // 调整 50.0f 为适当的触摸范围
+                {
+                    // 触摸点在炮塔范围内
+                    CCLOG("Touch on tower at (%f, %f)", touchPos.x, touchPos.y);
+                    return true;
+                }
+            }
+        }
+    }
+
+    // 触摸点不在任何炮塔范围内
+    return false;
+}
 
 
 
@@ -272,6 +366,8 @@ void Tower::removeTowerButton()
         Menu* existingMenu4 = dynamic_cast<Menu*>(parentNode->getChildByName("menu4"));
         Menu* existingMenu5 = dynamic_cast<Menu*>(parentNode->getChildByName("menu5"));
         Menu* existingMenu6 = dynamic_cast<Menu*>(parentNode->getChildByName("menu6"));
+        Menu* existingMenu7 = dynamic_cast<Menu*>(parentNode->getChildByName("menu7"));
+        Menu* existingMenu8 = dynamic_cast<Menu*>(parentNode->getChildByName("menu8"));
         if (existingMenu)
         {
             existingMenu->removeFromParent();
@@ -300,6 +396,16 @@ void Tower::removeTowerButton()
         if (existingMenu6)
         {
             existingMenu6->removeFromParent();
+            removeSelectionIcon();
+        }
+        if (existingMenu7)
+        {
+            existingMenu7->removeFromParent();
+            removeSelectionIcon();
+        }
+        if (existingMenu8)
+        {
+            existingMenu8->removeFromParent();
             removeSelectionIcon();
         }
     }
@@ -342,6 +448,25 @@ void Tower::onMenuItemClicked2(Ref* sender)
     // 将新的 Tower2 添加到场景中
     this->getParent()->addChild(fan);
 }
+//炮塔选择按钮3的回调函数
+void Tower::onMenuItemClicked7(Ref* sender)
+{
+    // 获取点击的菜单项
+    MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
+
+    // 使用保存的触摸点的位置
+    Vec2 touchPos = m_lastTouchPos;
+
+    // 移除按钮
+    removeTowerButton();
+    // 创建一个新的 Tower 对象
+    Tower3* Pin = Tower3::createTower("Pin11.png");
+    Pin->setPosition(touchPos);
+
+    // 将新的 Tower 添加到场景中
+    this->getParent()->addChild(Pin);
+
+}
 void Tower::onMenuItemClicked3(Ref* sender)
 {
     // 获取点击的菜单项
@@ -367,6 +492,19 @@ void Tower::onMenuItemClicked4(Ref* sender)
     // 移除按钮
     removeTowerButton();
 }
+void Tower::onMenuItemClicked8(Ref* sender)
+{
+    // 获取点击的菜单项
+    MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
+
+    // 使用保存的触摸点的位置
+    Vec2 touchPos = m_lastTouchPos;
+    // 除去炮塔
+    removeTowerAt3(touchPos); // 将参数改为 touchPos
+    // 移除按钮
+    removeTowerButton();
+    removeTowerButton();
+}
 void Tower::onMenuItemClicked5(Ref* sender)
 {
     // 获取点击的菜单项
@@ -388,6 +526,18 @@ void Tower::onMenuItemClicked6(Ref* sender)
     Vec2 touchPos = m_lastTouchPos;
     // 升级炮塔
     upgradeTower2(touchPos);
+    // 移除按钮
+    removeTowerButton();
+}
+void Tower::onMenuItemClicked9(Ref* sender)
+{
+    // 获取点击的菜单项
+    MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
+
+    // 使用保存的触摸点的位置
+    Vec2 touchPos = m_lastTouchPos;
+    // 升级炮塔
+    upgradeTower3(touchPos);
     // 移除按钮
     removeTowerButton();
 }
@@ -468,7 +618,44 @@ void Tower::upgradeTower2(const cocos2d::Vec2& touchPos)
         }
     }
 }
+void Tower::upgradeTower3(const cocos2d::Vec2& touchPos)
+{
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 尝试将节点转换为 Tower2 类型
+            Tower3* tower3 = dynamic_cast<Tower3*>(child);
+            if (tower3)
+            {
+                // 获取炮塔的世界坐标
+                Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
+                // 检查触摸点是否在炮塔范围内
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // 调整 50.0f 为适当的触摸范围
+                {// 升级该炮塔，但限制最大等级为3
+                    if (tower3->towerLevel3 < MAX_TOWER2_LEVEL)
+                    {
+                        tower3->towerLevel3++;
+
+                        // 更新炮塔贴图
+                        std::string newTowerImage = StringUtils::format("Pin1%d.png", tower3->towerLevel3);
+                        tower3->setTexture(newTowerImage.c_str());
+
+                        // 这里可以添加其他升级操作，例如扣除资源等
+                    }
+                    // 在这里可以添加其他升级操作
+                }
+            }
+        }
+    }
+}
 
 
 void Tower::removeTowerAt(const Vec2& touchPos)
@@ -573,7 +760,57 @@ void Tower::removeTowerAt2(const Vec2& touchPos)
     // 如果未找到要删除的炮塔
     CCLOG("Error: Tower not found at position (%f, %f)", touchPos.x, touchPos.y);
 }
+void Tower::removeTowerAt3(const Vec2& touchPos)
+{
+    // 获取当前节点所在的场景
+    cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
+    if (scene)
+    {
+        // 获取场景中的所有子节点
+        Vector<Node*> children = scene->getChildren();
+
+        // 遍历子节点
+        for (Node* child : children)
+        {
+            // 使用 dynamic_cast 检查节点是否是 Tower2 类型
+            Tower3* tower3 = dynamic_cast<Tower3*>(child);
+            if (tower3)
+            {
+                // 获取炮塔的世界坐标
+                Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
+
+                // 检查触摸点是否在炮塔范围内
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // 调整 50.0f 为适当的触摸范围
+                {
+                    // 从父节点中移除炮塔
+                    child->removeFromParent();
+                    return; // 找到并移除炮塔后结束函数
+                }
+            }
+        }
+        //// 遍历子节点，查找与触摸点位置相近的炮塔
+        //for (Node* child : getChildren())
+        //{
+        //    // 检查节点是否是 Tower 类型且已经放置
+        //    if (dynamic_cast<Tower*>(child) && dynamic_cast<Tower*>(child)->isPlaced())
+        //    {
+        //        // 获取节点的世界坐标
+        //        Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
+
+        //        // 检查触摸点是否接近炮塔的位置
+        //        if (touchPos.getDistance(towerWorldPos) < 50.0f) // 调整 50.0f 为适当的距离
+        //        {
+        //            // 从父节点中移除炮塔
+        //            child->removeFromParent();
+        //            return; // 找到并移除炮塔后结束函数
+        //        }
+        //    }
+    }
+
+    // 如果未找到要删除的炮塔
+    CCLOG("Error: Tower not found at position (%f, %f)", touchPos.x, touchPos.y);
+}
 
 
 void Tower::onTouchMoved(Touch* touch, Event* event)
@@ -589,6 +826,7 @@ void Tower::onTouchEnded(Touch* touch, Event* event)
 void Tower::update(float delta) {
     // 在 update 函数中实时更新炮塔的转向逻辑
     handleBulletSpriteCollisions(); // 调用处理转向的函数
+
 }
 void Tower::handleBulletSpriteCollisions()//实现炮塔转向
 {
@@ -666,6 +904,7 @@ void Tower::handleBulletSpriteCollisions()//实现炮塔转向
         }
     }
 }
+
 void Tower::showSelectionIcon(const Vec2& position) {
     // 创建选中图标精灵
     auto selectionSprite = Sprite::create("select_02.png"); // 使用你自己的选中图标图片路径

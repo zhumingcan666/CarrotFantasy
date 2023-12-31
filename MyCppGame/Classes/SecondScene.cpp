@@ -4,19 +4,17 @@
 #include "ui/CocosGUI.h"
 #include "SimpleAudioEngine.h"
 #include"carrot.h"
+#include"Bullet.h"
 #include"Tower.h"
 #include"Tower2.h"
-//#include"Bullet.h"
+#include"Tower3.h"
 #include<vector>
 #include"Coin.h"
 #include"Monster.h"
 #include <cstdlib>  // 包含随机数函数的头文件
 #include <ctime>    // 包含时间函数的头文件
-#include"Barrier.h"
+
 USING_NS_CC;
-
-
-
 
 /*********************************************************************创建第一个地图场景**********************************************************/
 Scene* SecondScene::createScene()
@@ -33,6 +31,9 @@ static void problemLoading(const char* filename)
 /*********************************************************************初始化第一个地图场景**********************************************************/
 bool SecondScene::init()
 {
+
+
+    //////////////////////////////////////////////////该if(1)中是各种按钮的实现
     if(1){
     //////////////////////////////
     // 1. super init first
@@ -60,19 +61,10 @@ bool SecondScene::init()
         // 将场景图片添加为此层的子节点
         this->addChild(sprite, 0);
     }
-    auto road = Sprite::create("road1.png");
-    if (road == nullptr)
-    {
-        problemLoading("'road1.png'");
-    }
-    else
-    {
-        // 将场景图片定位在屏幕中央
+       auto road = Sprite::create("road1.png");
         road->setPosition(Vec2(visibleSize.width / 2 + origin.x, 500));
-
         // 将场景图片添加为此层的子节点
         this->addChild(road, 0);
-    }
     auto menubg = Sprite::create("menubg(1).png");
     if (menubg == nullptr)
     {
@@ -88,10 +80,11 @@ bool SecondScene::init()
     }
     /*********************************************************************创建一个返回主菜单按钮（homeItem)**********************************************************/
     if (1) {
+        //回到选择页面
         auto homeItem = MenuItemImage::create(
             "back.png",
             "back_pressed.png",
-            CC_CALLBACK_1(SecondScene::menuBackHome, this));
+            CC_CALLBACK_1(SecondScene::menuBack, this));
 
         // 检查图标是否加载成功，若未加载成功，则输出问题信息
         if (homeItem == nullptr ||
@@ -111,9 +104,19 @@ bool SecondScene::init()
 
 
         // 创建菜单，这是一个自动释放的对象
+        //回到主页面
         auto menu = Menu::create(homeItem, NULL);
         menu->setPosition(Vec2::ZERO);
         this->addChild(menu, 1);
+
+        auto backhome = MenuItemImage::create(
+            "return1.png",
+            "return.png",
+            CC_CALLBACK_1(SecondScene::menuBackHome, this));
+        backhome->setPosition(1700, 1250);
+        auto menu1 = Menu::create(backhome, NULL);
+        menu1->setPosition(Vec2::ZERO);
+        this->addChild(menu1, 3);
 
     }
     /*********************************************************************创建第一个地图的音乐**********************************************************/
@@ -168,38 +171,53 @@ bool SecondScene::init()
     }
 
 
-}
+   }
+   //////////////////////////////////////////////////以上为按钮实现
+
+
+    /******************************************************************炮塔实现****************************************************/
+   Tower* tower = Tower::createTower("Bottle11.png");
+   this->addChild(tower);
+   Tower2* fan = Tower2::createTower("Fan11.png");
+   this->addChild(fan);
+   Tower3* Pin = Tower3::createTower("Pin11.png");
+   this->addChild(Pin);
+
+
+
     /******************************************************************创建萝卜****************************************************/
     auto carrot = Carrot::createSprite(1775, 995);
     carrot->setTag(1);
     addChild(carrot);
-    /******************************************************************创建炮塔***********************************************************/
-    Tower* tower = Tower::createTower("Bottle11.png");
 
-    this->addChild(tower);
-    Tower2* fan = Tower2::createTower("Fan11.png");
-
-    this->addChild(fan);
     /************************************************************************创建怪物精灵***********************************************************************/
-    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster0), 4.0f, 7, 0);
-    /************************************************************************创建障碍物***********************************************************************/
-  //scheduleOnce(CC_SCHEDULE_SELECTOR(SecondScene::createBarriers), 0.0f);
+    int round = 1;
+    schedule(CC_SCHEDULE_SELECTOR(SecondScene::createAndMoveMonster1), 4.0f, 7, 0);
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*********************************************************************创建金币系统**********************************************************/
     auto coin = Coin::create();
     coin->setTag(1001); // 设置独特的标签
     addChild(coin);
-
     return true;
+
+
+
 
 }
 /************************************************************************返回主菜单按钮的回调函数**********************************************************/
+void SecondScene::menuBack(Ref* pSender)
+{
+    auto levelSelectScene = LevelSelectScene::create();
+    Director::getInstance()->replaceScene(levelSelectScene);
+}
 void SecondScene::menuBackHome(Ref* pSender)
 {
-    auto helloWorld = HelloWorld::create();
-    Director::getInstance()->replaceScene(helloWorld);
+    auto home = HelloWorld::create();
+    Director::getInstance()->replaceScene(home);
 }
+
 /***********************************************************************控制背景音乐的回调函数***************************************************************/
 void SecondScene::MusicControl(Ref* sender)
 {
@@ -218,7 +236,7 @@ void SecondScene::MusicControl(Ref* sender)
     }
 
 }
-void SecondScene::createAndMoveMonster0(float dt)
+void SecondScene::createAndMoveMonster1(float dt)
 {
     std::vector<Vec2> path = {
    Vec2(230, 470),
@@ -227,7 +245,7 @@ void SecondScene::createAndMoveMonster0(float dt)
    Vec2(1230, 620),
    Vec2(1230, 470),
    Vec2(1738, 470),
-   Vec2(1738, 970),
+   Vec2(1738, 920),
    // 添加更多路径点...
     };
 
@@ -236,43 +254,3 @@ void SecondScene::createAndMoveMonster0(float dt)
     monster->setPosition(Vec2(230, 970));
     addChild(monster);
 }
-//void SecondScene::createBarriers(float dt)
-//{
-//
-//  std::vector<Vec2> path = {
-//Vec2(117*4, 172*4),
-//Vec2(152*4,172 * 4),
-//Vec2(120*4, 234*4),
-//Vec2(200*4, 215*4),
-//Vec2(242*4, 90*4),
-//Vec2(261*4, 210*4),
-//Vec2(1738, 970),
-//// 添加更多路径点...
-//    };
-//
-//      Barrier* barrier1 = Barrier::create("Barrier1.png", 100, 100);
-//      barrier1->setPosition(path[0]);
-//      addChild(barrier1);
-//
-//      Barrier* barrier2 = Barrier::create("Barrier1.png", 100, 100);
-//      barrier2->setPosition(path[1]);
-//      addChild(barrier2);
-//
-//
-//      Barrier* barrier3 = Barrier::create("Barrier2.png", 100, 100);
-//      barrier3->setPosition(path[2]);
-//      addChild(barrier3);
-//
-//      Barrier* barrier4 = Barrier::create("Barrier3.png", 100, 100);
-//      barrier4->setPosition(path[3]);
-//      addChild(barrier4);
-//
-//      Barrier* barrier5 = Barrier::create("Barrier4.png", 100, 100);
-//      barrier5->setPosition(path[4]);
-//      addChild(barrier5);
-//
-//      Barrier* barrier6 = Barrier::create("Barrier3.png", 100, 100);
-//      barrier6->setPosition(path[5]);
-//      addChild(barrier6);
-//
-//}
