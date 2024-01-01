@@ -30,9 +30,9 @@ bool Tower::init(const std::string& towerImage)
     {
         return false;
     }
-    // ×¢²á update º¯Êı
+    // æ³¨å†Œ update å‡½æ•°
     this->scheduleUpdate();
-    // ÉèÖÃ´¥Ãş¼àÌıÆ÷
+    // è®¾ç½®è§¦æ‘¸ç›‘å¬å™¨
     auto listener = EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
     listener->onTouchBegan = CC_CALLBACK_2(Tower::onTouchBegan, this);
@@ -40,8 +40,10 @@ bool Tower::init(const std::string& towerImage)
     listener->onTouchEnded = CC_CALLBACK_2(Tower::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
-    m_towerImage = towerImage;//ÅÚËşÍ¼Æ¬Â·¾¶
+    m_towerImage = towerImage;//ç‚®å¡”å›¾ç‰‡è·¯å¾„
     schedule(schedule_selector(Tower::shootBullet1), 2.0f);
+        schedule(schedule_selector(Tower::handleBulletSpriteCollisions));
+
     return true;
 }
 
@@ -49,13 +51,13 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
 {
 
 
-    // »ñÈ¡´¥ÃşµãµÄÎ»ÖÃ
+    // è·å–è§¦æ‘¸ç‚¹çš„ä½ç½®
     m_lastTouchPos = this->getParent()->convertToNodeSpace(touch->getLocation());
 
-    bool is_TouchOnTower = isTouchOnTower(m_lastTouchPos);//ÅĞ¶Ï´¥ÃşµãÉÏÊÇ·ñÓĞTower1
-    bool is_TouchOnTower2 = isTouchOnTower2(m_lastTouchPos);//ÅĞ¶Ï´¥ÃşµãÉÏÊÇ·ñÓĞTower2
-    bool is_TouchOnTower3 = isTouchOnTower3(m_lastTouchPos);//ÅĞ¶Ï´¥ÃşµãÉÏÊÇ·ñÓĞTower3
-    bool is_TouchOnTower4 = isTouchOnTower4(m_lastTouchPos);//ÅĞ¶Ï´¥ÃşµãÉÏÊÇ·ñÓĞcarrotÂÜ²·
+    bool is_TouchOnTower = isTouchOnTower(m_lastTouchPos);//åˆ¤æ–­è§¦æ‘¸ç‚¹ä¸Šæ˜¯å¦æœ‰Tower1
+    bool is_TouchOnTower2 = isTouchOnTower2(m_lastTouchPos);//åˆ¤æ–­è§¦æ‘¸ç‚¹ä¸Šæ˜¯å¦æœ‰Tower2
+    bool is_TouchOnTower3 = isTouchOnTower3(m_lastTouchPos);//åˆ¤æ–­è§¦æ‘¸ç‚¹ä¸Šæ˜¯å¦æœ‰Tower3
+    bool is_TouchOnTower4 = isTouchOnTower4(m_lastTouchPos);//åˆ¤æ–­è§¦æ‘¸ç‚¹ä¸Šæ˜¯å¦æœ‰carrotèåœ
     if (!is_TouchOnTower && !is_TouchOnTower2 && !is_TouchOnTower3 && !is_TouchOnTower4) {
         Rect allowedRect(100, 100, 200, 200);
         Rect forbiddenRect1(150, 300, 200, 1200);
@@ -64,104 +66,104 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
         Rect forbiddenRect4(1150, 300, 700, 200);
         Rect forbiddenRect5(1650, 300, 200, 1200);
         Rect forbiddenRect6(0, 1150, 2000, 150);
-        // ÔÚµã»÷Ö®Ç°¼ì²éÊÇ·ñÒÑ´æÔÚ°´Å¥£¬´æÔÚÔòÒÆ³ı
+        // åœ¨ç‚¹å‡»ä¹‹å‰æ£€æŸ¥æ˜¯å¦å·²å­˜åœ¨æŒ‰é’®ï¼Œå­˜åœ¨åˆ™ç§»é™¤
         removeTowerButton();
         if (!forbiddenRect1.containsPoint(m_lastTouchPos) && !forbiddenRect2.containsPoint(m_lastTouchPos) && !forbiddenRect3.containsPoint(m_lastTouchPos) && !forbiddenRect4.containsPoint(m_lastTouchPos) && !forbiddenRect5.containsPoint(m_lastTouchPos) && !forbiddenRect6.containsPoint(m_lastTouchPos))
         {
-            // ÏÔÊ¾Ñ¡ÖĞÍ¼±ê
+            // æ˜¾ç¤ºé€‰ä¸­å›¾æ ‡
             showSelectionIcon(m_lastTouchPos);
-            // ´´½¨Ò»¸öĞÂµÄ MenuItemImage ¶ÔÏó
+            // åˆ›å»ºä¸€ä¸ªæ–°çš„ MenuItemImage å¯¹è±¡
             auto menuItem = MenuItemImage::create("Bottle01.png", "Bottle01.png", "Bottle00.png", CC_CALLBACK_1(Tower::onMenuItemClicked, this));
-            // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+            // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
             cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
             if (scene)
             {
-                // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+                // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
                 Vector<Node*> children = scene->getChildren();
 
-                // ±éÀú×Ó½Úµã
+                // éå†å­èŠ‚ç‚¹
                 for (Node* child : children)
                 {
-                    // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                    // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                     Coin* coin = dynamic_cast<Coin*>(child);
                     if (coin)
                     {
                         if (coin->coinCount < 100)
                         {
-                            menuItem->setEnabled(false);  // ³õÊ¼ÉèÖÃÎª²»¿ÉÑ¡ÖĞ×´Ì¬
+                            menuItem->setEnabled(false);  // åˆå§‹è®¾ç½®ä¸ºä¸å¯é€‰ä¸­çŠ¶æ€
                         }
                     }
                 }
             }
-            menuItem->setName("MenuItem"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-            // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« MenuItemImage Ìí¼Óµ½²Ëµ¥ÖĞ
+            menuItem->setName("MenuItem"); // è®¾ç½®èœå•é¡¹çš„åç§°
+            // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† MenuItemImage æ·»åŠ åˆ°èœå•ä¸­
             auto menu = Menu::create(menuItem, nullptr);
             menu->setPosition(m_lastTouchPos + Vec2(-60, 70));
-            menu->setName("menu"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu->setName("menu"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu);
-            //´´½¨Ò»¸öĞÂµÄ MenuItemImage ¶ÔÏó
+            //åˆ›å»ºä¸€ä¸ªæ–°çš„ MenuItemImage å¯¹è±¡
             auto menuItem2 = MenuItemImage::create("Fan01.png", "Fan01.png", "Fan00.png", CC_CALLBACK_1(Tower::onMenuItemClicked2, this));
-            // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+            // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
             cocos2d::Scene* scene2 = Director::getInstance()->getRunningScene();
 
             if (scene2)
             {
-                // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+                // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
                 Vector<Node*> children = scene->getChildren();
 
-                // ±éÀú×Ó½Úµã
+                // éå†å­èŠ‚ç‚¹
                 for (Node* child : children)
                 {
-                    // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                    // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                     Coin* coin = dynamic_cast<Coin*>(child);
                     if (coin)
                     {
                         if (coin->coinCount < 160)
                         {
-                            menuItem2->setEnabled(false);  // ³õÊ¼ÉèÖÃÎª²»¿ÉÑ¡ÖĞ×´Ì¬
+                            menuItem2->setEnabled(false);  // åˆå§‹è®¾ç½®ä¸ºä¸å¯é€‰ä¸­çŠ¶æ€
                         }
                     }
                 }
             }
-            menuItem2->setName("MenuItem2"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-            // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« MenuItemImage Ìí¼Óµ½²Ëµ¥ÖĞ
+            menuItem2->setName("MenuItem2"); // è®¾ç½®èœå•é¡¹çš„åç§°
+            // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† MenuItemImage æ·»åŠ åˆ°èœå•ä¸­
             auto menu2 = Menu::create(menuItem2, nullptr);
             menu2->setPosition(m_lastTouchPos + Vec2(10, 70));
-            menu2->setName("menu2"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu2->setName("menu2"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu2);
-            //´´½¨Ò»¸öĞÂµÄ MenuItemImage ¶ÔÏó
+            //åˆ›å»ºä¸€ä¸ªæ–°çš„ MenuItemImage å¯¹è±¡
             auto menuItem3 = MenuItemImage::create("Pin01.png", "Pin01.png", "Pin00.png", CC_CALLBACK_1(Tower::onMenuItemClicked7, this));
-            // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+            // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
             cocos2d::Scene* scene3 = Director::getInstance()->getRunningScene();
 
             if (scene)
             {
-                // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+                // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
                 Vector<Node*> children = scene->getChildren();
 
-                // ±éÀú×Ó½Úµã
+                // éå†å­èŠ‚ç‚¹
                 for (Node* child : children)
                 {
-                    // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                    // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                     Coin* coin = dynamic_cast<Coin*>(child);
                     if (coin)
                     {
                         if (coin->coinCount < 160)
                         {
-                            menuItem3->setEnabled(false);  // ³õÊ¼ÉèÖÃÎª²»¿ÉÑ¡ÖĞ×´Ì¬
+                            menuItem3->setEnabled(false);  // åˆå§‹è®¾ç½®ä¸ºä¸å¯é€‰ä¸­çŠ¶æ€
                         }
                     }
                 }
             }
-            menuItem3->setName("MenuItem3"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-            // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« MenuItemImage Ìí¼Óµ½²Ëµ¥ÖĞ
+            menuItem3->setName("MenuItem3"); // è®¾ç½®èœå•é¡¹çš„åç§°
+            // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† MenuItemImage æ·»åŠ åˆ°èœå•ä¸­
             auto menu7 = Menu::create(menuItem3, nullptr);
             menu7->setPosition(m_lastTouchPos + Vec2(80, 70));
-            menu7->setName("menu3"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu7->setName("menu3"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu7);
             return true;
         }
@@ -169,253 +171,253 @@ bool Tower::onTouchBegan(Touch* touch, Event* event)
     else if (is_TouchOnTower)
     {
         removeTowerButton();
-        //É¾µô°´Å¥
-        // ´´½¨Ò»¸öĞÂµÄ MenuItemImage ¶ÔÏó
+        //åˆ æ‰æŒ‰é’®
+        // åˆ›å»ºä¸€ä¸ªæ–°çš„ MenuItemImage å¯¹è±¡
         auto deleteItem = MenuItemImage::create("sell_80.png.png", "sell_80.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked3, this));
-        deleteItem->setName("DeleteItem"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-        // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« DeleteItem Ìí¼Óµ½²Ëµ¥ÖĞ
+        deleteItem->setName("DeleteItem"); // è®¾ç½®èœå•é¡¹çš„åç§°
+        // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† DeleteItem æ·»åŠ åˆ°èœå•ä¸­
         auto menu3 = Menu::create(deleteItem, nullptr);
-        //Éı¼¶°´Å¥
+        //å‡çº§æŒ‰é’®
         auto upgradeItem = MenuItemImage::create("upgrade_180.png.png", "upgrade_180.png.png", "upgrade_-180.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked5, this));
-        // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+        // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
         cocos2d::Scene* scene4 = Director::getInstance()->getRunningScene();
 
         if (scene4)
         {
-            // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+            // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
             Vector<Node*> children = scene4->getChildren();
 
-            // ±éÀú×Ó½Úµã
+            // éå†å­èŠ‚ç‚¹
             for (Node* child : children)
             {
-                // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                 Coin* coin = dynamic_cast<Coin*>(child);
                 if (coin)
                 {
                     if (coin->coinCount < 180)
                     {
-                        upgradeItem->setEnabled(false);  // ³õÊ¼ÉèÖÃÎª²»¿ÉÑ¡ÖĞ×´Ì¬
+                        upgradeItem->setEnabled(false);  // åˆå§‹è®¾ç½®ä¸ºä¸å¯é€‰ä¸­çŠ¶æ€
                     }
                 }
             }
         }
-        upgradeItem->setName("UpgradeItem"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-        // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« UpgradeItem Ìí¼Óµ½²Ëµ¥ÖĞ
+        upgradeItem->setName("UpgradeItem"); // è®¾ç½®èœå•é¡¹çš„åç§°
+        // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† UpgradeItem æ·»åŠ åˆ°èœå•ä¸­
         auto menu5 = Menu::create(upgradeItem, nullptr);
-        // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+        // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
         cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
         if (scene)
         {
-            // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+            // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
             Vector<Node*> children = scene->getChildren();
 
-            // ±éÀú×Ó½Úµã
+            // éå†å­èŠ‚ç‚¹
             for (Node* child : children)
             {
-                // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                 Tower* tower = dynamic_cast<Tower*>(child);
                 if (tower)
                 {
-                    // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                    // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                     Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                    // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                    if (m_lastTouchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                    // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                    if (m_lastTouchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                     {
                         towerposition = tower->getPosition();
                     }
                 }
             }
             menu3->setPosition(towerposition + Vec2(0, -80));
-            menu3->setName("menu3"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu3->setName("menu3"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu3);
             menu5->setPosition(towerposition + Vec2(0, 80));
-            menu5->setName("menu5"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu5->setName("menu5"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu5);
         }
     }
     else if (is_TouchOnTower2)
     {
         removeTowerButton();
-        // ´´½¨Ò»¸öĞÂµÄ MenuItemImage ¶ÔÏó
+        // åˆ›å»ºä¸€ä¸ªæ–°çš„ MenuItemImage å¯¹è±¡
         auto deleteItem2 = MenuItemImage::create("sell_96.png.png", "sell_96.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked4, this));
-        deleteItem2->setName("DeleteItem"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-        // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« DeleteItem Ìí¼Óµ½²Ëµ¥ÖĞ
+        deleteItem2->setName("DeleteItem"); // è®¾ç½®èœå•é¡¹çš„åç§°
+        // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† DeleteItem æ·»åŠ åˆ°èœå•ä¸­
         auto menu4 = Menu::create(deleteItem2, nullptr);
-        //Éı¼¶°´Å¥
+        //å‡çº§æŒ‰é’®
         auto upgradeItem2 = MenuItemImage::create("upgrade_220.png.png", "upgrade_220.png.png", "upgrade_-220.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked6, this));
-        // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+        // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
         cocos2d::Scene* scene5 = Director::getInstance()->getRunningScene();
 
         if (scene5)
         {
-            // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+            // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
             Vector<Node*> children = scene5->getChildren();
 
-            // ±éÀú×Ó½Úµã
+            // éå†å­èŠ‚ç‚¹
             for (Node* child : children)
             {
-                // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                 Coin* coin = dynamic_cast<Coin*>(child);
                 if (coin)
                 {
                     if (coin->coinCount < 220)
                     {
-                        upgradeItem2->setEnabled(false);  // ³õÊ¼ÉèÖÃÎª²»¿ÉÑ¡ÖĞ×´Ì¬
+                        upgradeItem2->setEnabled(false);  // åˆå§‹è®¾ç½®ä¸ºä¸å¯é€‰ä¸­çŠ¶æ€
                     }
                 }
             }
         }
-        upgradeItem2->setName("UpgradeItem2"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-        // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« UpgradeItem2 Ìí¼Óµ½²Ëµ¥ÖĞ
+        upgradeItem2->setName("UpgradeItem2"); // è®¾ç½®èœå•é¡¹çš„åç§°
+        // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† UpgradeItem2 æ·»åŠ åˆ°èœå•ä¸­
         auto menu6 = Menu::create(upgradeItem2, nullptr);
-        // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+        // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
         cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
         if (scene)
         {
-            // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+            // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
             Vector<Node*> children = scene->getChildren();
 
-            // ±éÀú×Ó½Úµã
+            // éå†å­èŠ‚ç‚¹
             for (Node* child : children)
             {
-                // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                 Tower2* tower = dynamic_cast<Tower2*>(child);
                 if (tower)
                 {
-                    // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                    // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                     Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                    // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                    if (m_lastTouchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                    // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                    if (m_lastTouchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                     {
                         towerposition = tower->getPosition();
                     }
                 }
             }
             menu4->setPosition(towerposition + Vec2(0, -70));
-            menu4->setName("menu4"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu4->setName("menu4"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu4);
             menu6->setPosition(towerposition + Vec2(0, 80));
-            menu6->setName("menu5"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu6->setName("menu5"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu6);
         }
     }
     else if (is_TouchOnTower3)
     {
         removeTowerButton();
-        //É¾µô°´Å¥
-        // ´´½¨Ò»¸öĞÂµÄ MenuItemImage ¶ÔÏó
+        //åˆ æ‰æŒ‰é’®
+        // åˆ›å»ºä¸€ä¸ªæ–°çš„ MenuItemImage å¯¹è±¡
         auto deleteItem3 = MenuItemImage::create("sell_128.png.png", "sell_128.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked8, this));
-        deleteItem3->setName("DeleteItem3"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-        // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« DeleteItem Ìí¼Óµ½²Ëµ¥ÖĞ
+        deleteItem3->setName("DeleteItem3"); // è®¾ç½®èœå•é¡¹çš„åç§°
+        // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† DeleteItem æ·»åŠ åˆ°èœå•ä¸­
         auto menu7 = Menu::create(deleteItem3, nullptr);
-        //Éı¼¶°´Å¥
+        //å‡çº§æŒ‰é’®
         auto upgradeItem3 = MenuItemImage::create("upgrade_220.png.png", "upgrade_220.png.png", "upgrade_-220.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked9, this));
         cocos2d::Scene* scene6 = Director::getInstance()->getRunningScene();
         if (scene6)
         {
-            // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+            // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
             Vector<Node*> children = scene6->getChildren();
 
-            // ±éÀú×Ó½Úµã
+            // éå†å­èŠ‚ç‚¹
             for (Node* child : children)
             {
-                // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                 Coin* coin = dynamic_cast<Coin*>(child);
                 if (coin)
                 {
                     if (coin->coinCount < 220)
                     {
-                        upgradeItem3->setEnabled(false);  // ³õÊ¼ÉèÖÃÎª²»¿ÉÑ¡ÖĞ×´Ì¬
+                        upgradeItem3->setEnabled(false);  // åˆå§‹è®¾ç½®ä¸ºä¸å¯é€‰ä¸­çŠ¶æ€
                     }
                 }
             }
         }
-        upgradeItem3->setName("UpgradeItem3"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-        // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« UpgradeItem Ìí¼Óµ½²Ëµ¥ÖĞ
+        upgradeItem3->setName("UpgradeItem3"); // è®¾ç½®èœå•é¡¹çš„åç§°
+        // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† UpgradeItem æ·»åŠ åˆ°èœå•ä¸­
         auto menu8 = Menu::create(upgradeItem3, nullptr);
-        // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+        // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
         cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
         if (scene)
         {
-            // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+            // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
             Vector<Node*> children = scene->getChildren();
 
-            // ±éÀú×Ó½Úµã
+            // éå†å­èŠ‚ç‚¹
             for (Node* child : children)
             {
-                // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+                // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
                 Tower3* tower3 = dynamic_cast<Tower3*>(child);
                 if (tower3)
                 {
-                    // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                    // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                     Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                    // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                    if (m_lastTouchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                    // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                    if (m_lastTouchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                     {
                         towerposition = tower3->getPosition();
                     }
                 }
             }
             menu7->setPosition(towerposition + Vec2(0, -80));
-            menu7->setName("menu7"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu7->setName("menu7"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu7);
             menu8->setPosition(towerposition + Vec2(0, 80));
-            menu8->setName("menu8"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-            // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+            menu8->setName("menu8"); // è®¾ç½®èœå•çš„åç§°
+            // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
             this->getParent()->addChild(menu8);
         }
     }
     else if (is_TouchOnTower4)
     {
         removeTowerButton();
-        //ÂÜ²·Éı¼¶°´Å¥
+        //èåœå‡çº§æŒ‰é’®
         auto upgradeItem4 = MenuItemImage::create("upgrade_220.png.png", "upgrade_220.png.png", CC_CALLBACK_1(Tower::onMenuItemClicked10, this));
-        upgradeItem4->setName("UpgradeItem4"); // ÉèÖÃ²Ëµ¥ÏîµÄÃû³Æ
-        // ´´½¨Ò»¸ö²Ëµ¥£¬²¢½« UpgradeItem4 Ìí¼Óµ½²Ëµ¥ÖĞ
+        upgradeItem4->setName("UpgradeItem4"); // è®¾ç½®èœå•é¡¹çš„åç§°
+        // åˆ›å»ºä¸€ä¸ªèœå•ï¼Œå¹¶å°† UpgradeItem4 æ·»åŠ åˆ°èœå•ä¸­
         auto menu9 = Menu::create(upgradeItem4, nullptr);
         Vec2 CarrotPos = Vec2(1775, 995);
         menu9->setPosition(CarrotPos + Vec2(0, 80));
-        menu9->setName("menu9"); // ÉèÖÃ²Ëµ¥µÄÃû³Æ
-        // ½«²Ëµ¥Ìí¼Óµ½³¡¾°ÖĞ
+        menu9->setName("menu9"); // è®¾ç½®èœå•çš„åç§°
+        // å°†èœå•æ·»åŠ åˆ°åœºæ™¯ä¸­
         this->getParent()->addChild(menu9);
     }
     return false;
 }
-//ÅĞ¶ÏÅÚËşÊÇ·ñÔÚ´¥ÃşµãµÄº¯Êı
+//åˆ¤æ–­ç‚®å¡”æ˜¯å¦åœ¨è§¦æ‘¸ç‚¹çš„å‡½æ•°
 bool Tower::isTouchOnTower(const cocos2d::Vec2& touchPos) const {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Tower* tower = dynamic_cast<Tower*>(child);
             if (tower)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                 {
-                    // ´¥ÃşµãÔÚÅÚËş·¶Î§ÄÚ
+                    // è§¦æ‘¸ç‚¹åœ¨ç‚®å¡”èŒƒå›´å†…
                     CCLOG("Touch on tower at (%f, %f)", touchPos.x, touchPos.y);
                     return true;
                 }
@@ -423,33 +425,33 @@ bool Tower::isTouchOnTower(const cocos2d::Vec2& touchPos) const {
         }
     }
 
-    // ´¥Ãşµã²»ÔÚÈÎºÎÅÚËş·¶Î§ÄÚ
+    // è§¦æ‘¸ç‚¹ä¸åœ¨ä»»ä½•ç‚®å¡”èŒƒå›´å†…
     return false;
 }
 bool Tower::isTouchOnTower2(const cocos2d::Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Tower2* tower2 = dynamic_cast<Tower2*>(child);
             if (tower2)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                 {
-                    // ´¥ÃşµãÔÚÅÚËş·¶Î§ÄÚ
+                    // è§¦æ‘¸ç‚¹åœ¨ç‚®å¡”èŒƒå›´å†…
                     CCLOG("Touch on tower at (%f, %f)", touchPos.x, touchPos.y);
                     return true;
                 }
@@ -457,33 +459,33 @@ bool Tower::isTouchOnTower2(const cocos2d::Vec2& touchPos)
         }
     }
 
-    // ´¥Ãşµã²»ÔÚÈÎºÎÅÚËş·¶Î§ÄÚ
+    // è§¦æ‘¸ç‚¹ä¸åœ¨ä»»ä½•ç‚®å¡”èŒƒå›´å†…
     return false;
 }
 bool Tower::isTouchOnTower3(const cocos2d::Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Tower3* tower3 = dynamic_cast<Tower3*>(child);
             if (tower3)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                 {
-                    // ´¥ÃşµãÔÚÅÚËş·¶Î§ÄÚ
+                    // è§¦æ‘¸ç‚¹åœ¨ç‚®å¡”èŒƒå›´å†…
                     CCLOG("Touch on tower at (%f, %f)", touchPos.x, touchPos.y);
                     return true;
                 }
@@ -491,24 +493,24 @@ bool Tower::isTouchOnTower3(const cocos2d::Vec2& touchPos)
         }
     }
 
-    // ´¥Ãşµã²»ÔÚÈÎºÎÅÚËş·¶Î§ÄÚ
+    // è§¦æ‘¸ç‚¹ä¸åœ¨ä»»ä½•ç‚®å¡”èŒƒå›´å†…
     return false;
 }
 bool Tower::isTouchOnTower4(const cocos2d::Vec2& touchPos)
 {
     Vec2 CarrotPos = Vec2(1775, 995);
-    if (m_lastTouchPos.getDistance(CarrotPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+    if (m_lastTouchPos.getDistance(CarrotPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
     {
         return true;
     }
-    // ´¥Ãşµã²»ÔÚÈÎºÎÅÚËş·¶Î§ÄÚ
+    // è§¦æ‘¸ç‚¹ä¸åœ¨ä»»ä½•ç‚®å¡”èŒƒå›´å†…
     return false;
 }
 
 
-// ÆäËû³ÉÔ±º¯ÊıµÄÊµÏÖ...
+// å…¶ä»–æˆå‘˜å‡½æ•°çš„å®ç°...
 
-//ÒÆ³ıÅÚËşÑ¡Ôñ°´Å¥
+//ç§»é™¤ç‚®å¡”é€‰æ‹©æŒ‰é’®
 void Tower::removeTowerButton()
 {
     Node* parentNode = this->getParent();
@@ -571,35 +573,35 @@ void Tower::removeTowerButton()
     }
 }
 
-//ÅÚËşÑ¡Ôñ°´Å¥1µÄ»Øµ÷º¯Êı
+//ç‚®å¡”é€‰æ‹©æŒ‰é’®1çš„å›è°ƒå‡½æ•°
 void Tower::onMenuItemClicked(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
 
-    // ÒÆ³ı°´Å¥
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
-    // ´´½¨Ò»¸öĞÂµÄ Tower ¶ÔÏó
+    // åˆ›å»ºä¸€ä¸ªæ–°çš„ Tower å¯¹è±¡
     Tower* tower = Tower::createTower("bottle11.png");
     tower->setPosition(touchPos);
 
-    // ½«ĞÂµÄ Tower Ìí¼Óµ½³¡¾°ÖĞ
+    // å°†æ–°çš„ Tower æ·»åŠ åˆ°åœºæ™¯ä¸­
     this->getParent()->addChild(tower);
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Coin* coin = dynamic_cast<Coin*>(child);
             if (coin)
             {
@@ -608,35 +610,35 @@ void Tower::onMenuItemClicked(Ref* sender)
         }
     }
 }
-//ÅÚËşÑ¡Ôñ°´Å¥2µÄ»Øµ÷º¯Êı
+//ç‚®å¡”é€‰æ‹©æŒ‰é’®2çš„å›è°ƒå‡½æ•°
 void Tower::onMenuItemClicked2(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
 
-    // ÒÆ³ı°´Å¥
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
-    // ´´½¨Ò»¸öĞÂµÄ Tower2 ¶ÔÏó
+    // åˆ›å»ºä¸€ä¸ªæ–°çš„ Tower2 å¯¹è±¡
     Tower2* fan = Tower2::createTower("Fan11.png");
     fan->setPosition(touchPos);
 
-    // ½«ĞÂµÄ Tower2 Ìí¼Óµ½³¡¾°ÖĞ
+    // å°†æ–°çš„ Tower2 æ·»åŠ åˆ°åœºæ™¯ä¸­
     this->getParent()->addChild(fan);
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Coin* coin = dynamic_cast<Coin*>(child);
             if (coin)
             {
@@ -645,35 +647,35 @@ void Tower::onMenuItemClicked2(Ref* sender)
         }
     }
 }
-//ÅÚËşÑ¡Ôñ°´Å¥3µÄ»Øµ÷º¯Êı
+//ç‚®å¡”é€‰æ‹©æŒ‰é’®3çš„å›è°ƒå‡½æ•°
 void Tower::onMenuItemClicked7(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
 
-    // ÒÆ³ı°´Å¥
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
-    // ´´½¨Ò»¸öĞÂµÄ Tower ¶ÔÏó
+    // åˆ›å»ºä¸€ä¸ªæ–°çš„ Tower å¯¹è±¡
     Tower3* Pin = Tower3::createTower("Pin11.png");
     Pin->setPosition(touchPos);
 
-    // ½«ĞÂµÄ Tower Ìí¼Óµ½³¡¾°ÖĞ
+    // å°†æ–°çš„ Tower æ·»åŠ åˆ°åœºæ™¯ä¸­
     this->getParent()->addChild(Pin);
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Coin* coin = dynamic_cast<Coin*>(child);
             if (coin)
             {
@@ -684,28 +686,28 @@ void Tower::onMenuItemClicked7(Ref* sender)
 }
 void Tower::onMenuItemClicked3(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
-    // ³ıÈ¥ÅÚËş
-    removeTowerAt(touchPos); // ½«²ÎÊı¸ÄÎª touchPos
-    // ÒÆ³ı°´Å¥
+    // é™¤å»ç‚®å¡”
+    removeTowerAt(touchPos); // å°†å‚æ•°æ”¹ä¸º touchPos
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
     removeTowerButton();
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Coin* coin = dynamic_cast<Coin*>(child);
             if (coin)
             {
@@ -716,27 +718,27 @@ void Tower::onMenuItemClicked3(Ref* sender)
 }
 void Tower::onMenuItemClicked4(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
-    // ³ıÈ¥ÅÚËş
-    removeTowerAt2(touchPos); // ½«²ÎÊı¸ÄÎª touchPos
-    // ÒÆ³ı°´Å¥
+    // é™¤å»ç‚®å¡”
+    removeTowerAt2(touchPos); // å°†å‚æ•°æ”¹ä¸º touchPos
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Coin* coin = dynamic_cast<Coin*>(child);
             if (coin)
             {
@@ -747,28 +749,28 @@ void Tower::onMenuItemClicked4(Ref* sender)
 }
 void Tower::onMenuItemClicked8(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
-    // ³ıÈ¥ÅÚËş
-    removeTowerAt3(touchPos); // ½«²ÎÊı¸ÄÎª touchPos
-    // ÒÆ³ı°´Å¥
+    // é™¤å»ç‚®å¡”
+    removeTowerAt3(touchPos); // å°†å‚æ•°æ”¹ä¸º touchPos
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
     removeTowerButton();
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Coin* coin = dynamic_cast<Coin*>(child);
             if (coin)
             {
@@ -779,27 +781,27 @@ void Tower::onMenuItemClicked8(Ref* sender)
 }
 void Tower::onMenuItemClicked5(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
-    // Éı¼¶ÅÚËş
+    // å‡çº§ç‚®å¡”
     upgradeTower(touchPos);
-    // ÒÆ³ı°´Å¥
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Coin* coin = dynamic_cast<Coin*>(child);
             if (coin)
             {
@@ -810,112 +812,112 @@ void Tower::onMenuItemClicked5(Ref* sender)
 }
 void Tower::onMenuItemClicked6(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
-    // Éı¼¶ÅÚËş
+    // å‡çº§ç‚®å¡”
     upgradeTower2(touchPos);
-    // ÒÆ³ı°´Å¥
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
 }
 void Tower::onMenuItemClicked9(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
-    // Éı¼¶ÅÚËş
+    // å‡çº§ç‚®å¡”
     upgradeTower3(touchPos);
-    // ÒÆ³ı°´Å¥
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
 }
 void Tower::onMenuItemClicked10(Ref* sender)
 {
-    // »ñÈ¡µã»÷µÄ²Ëµ¥Ïî
+    // è·å–ç‚¹å‡»çš„èœå•é¡¹
     MenuItemImage* menuItem = static_cast<MenuItemImage*>(sender);
 
-    // Ê¹ÓÃ±£´æµÄ´¥ÃşµãµÄÎ»ÖÃ
+    // ä½¿ç”¨ä¿å­˜çš„è§¦æ‘¸ç‚¹çš„ä½ç½®
     Vec2 touchPos = m_lastTouchPos;
-    // Éı¼¶ÅÚËş
+    // å‡çº§ç‚®å¡”
     upgradeCarrot(touchPos);
-    // ÒÆ³ı°´Å¥
+    // ç§»é™¤æŒ‰é’®
     removeTowerButton();
 }
 void Tower::upgradeTower(const cocos2d::Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower ç±»å‹
             Tower* tower = dynamic_cast<Tower*>(child);
             if (tower)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                 {
-                    // Éı¼¶¸ÃÅÚËş£¬µ«ÏŞÖÆ×î´óµÈ¼¶Îª3
+                    // å‡çº§è¯¥ç‚®å¡”ï¼Œä½†é™åˆ¶æœ€å¤§ç­‰çº§ä¸º3
                     if (tower->towerLevel < MAX_TOWER_LEVEL)
                     {
                         tower->towerLevel++;
 
-                        // ¸üĞÂÅÚËşÌùÍ¼
+                        // æ›´æ–°ç‚®å¡”è´´å›¾
                         std::string newTowerImage = StringUtils::format("Bottle1%d.png", tower->towerLevel);
                         tower->setTexture(newTowerImage.c_str());
 
-                        // ÕâÀï¿ÉÒÔÌí¼ÓÆäËûÉı¼¶²Ù×÷£¬ÀıÈç¿Û³ı×ÊÔ´µÈ
+                        // è¿™é‡Œå¯ä»¥æ·»åŠ å…¶ä»–å‡çº§æ“ä½œï¼Œä¾‹å¦‚æ‰£é™¤èµ„æºç­‰
                     }
                 }
             }
         }
     }
 }
-// Tower ÀàÖĞµÄÉı¼¶º¯Êı Tower::upgradeTower µÄÊµÏÖ
+// Tower ç±»ä¸­çš„å‡çº§å‡½æ•° Tower::upgradeTower çš„å®ç°
 void Tower::upgradeTower2(const cocos2d::Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // ³¢ÊÔ½«½Úµã×ª»»Îª Tower2 ÀàĞÍ
+            // å°è¯•å°†èŠ‚ç‚¹è½¬æ¢ä¸º Tower2 ç±»å‹
             Tower2* tower2 = dynamic_cast<Tower2*>(child);
             if (tower2)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
-                {// Éı¼¶¸ÃÅÚËş£¬µ«ÏŞÖÆ×î´óµÈ¼¶Îª3
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
+                {// å‡çº§è¯¥ç‚®å¡”ï¼Œä½†é™åˆ¶æœ€å¤§ç­‰çº§ä¸º3
                     if (tower2->towerLevel2 < MAX_TOWER2_LEVEL)
                     {
                         tower2->towerLevel2++;
 
-                        // ¸üĞÂÅÚËşÌùÍ¼
+                        // æ›´æ–°ç‚®å¡”è´´å›¾
                         std::string newTowerImage = StringUtils::format("Fan1%d.png", tower2->towerLevel2);
                         tower2->setTexture(newTowerImage.c_str());
 
-                        // ÕâÀï¿ÉÒÔÌí¼ÓÆäËûÉı¼¶²Ù×÷£¬ÀıÈç¿Û³ı×ÊÔ´µÈ
+                        // è¿™é‡Œå¯ä»¥æ·»åŠ å…¶ä»–å‡çº§æ“ä½œï¼Œä¾‹å¦‚æ‰£é™¤èµ„æºç­‰
                     }
-                    // ÔÚÕâÀï¿ÉÒÔÌí¼ÓÆäËûÉı¼¶²Ù×÷
+                    // åœ¨è¿™é‡Œå¯ä»¥æ·»åŠ å…¶ä»–å‡çº§æ“ä½œ
                 }
             }
         }
@@ -923,37 +925,37 @@ void Tower::upgradeTower2(const cocos2d::Vec2& touchPos)
 }
 void Tower::upgradeTower3(const cocos2d::Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // ³¢ÊÔ½«½Úµã×ª»»Îª Tower2 ÀàĞÍ
+            // å°è¯•å°†èŠ‚ç‚¹è½¬æ¢ä¸º Tower2 ç±»å‹
             Tower3* tower3 = dynamic_cast<Tower3*>(child);
             if (tower3)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
-                {// Éı¼¶¸ÃÅÚËş£¬µ«ÏŞÖÆ×î´óµÈ¼¶Îª3
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
+                {// å‡çº§è¯¥ç‚®å¡”ï¼Œä½†é™åˆ¶æœ€å¤§ç­‰çº§ä¸º3
                     if (tower3->towerLevel3 < MAX_TOWER2_LEVEL)
                     {
                         tower3->towerLevel3++;
 
-                        // ¸üĞÂÅÚËşÌùÍ¼
+                        // æ›´æ–°ç‚®å¡”è´´å›¾
                         std::string newTowerImage = StringUtils::format("Pin1%d.png", tower3->towerLevel3);
                         tower3->setTexture(newTowerImage.c_str());
 
-                        // ÕâÀï¿ÉÒÔÌí¼ÓÆäËûÉı¼¶²Ù×÷£¬ÀıÈç¿Û³ı×ÊÔ´µÈ
+                        // è¿™é‡Œå¯ä»¥æ·»åŠ å…¶ä»–å‡çº§æ“ä½œï¼Œä¾‹å¦‚æ‰£é™¤èµ„æºç­‰
                     }
-                    // ÔÚÕâÀï¿ÉÒÔÌí¼ÓÆäËûÉı¼¶²Ù×÷
+                    // åœ¨è¿™é‡Œå¯ä»¥æ·»åŠ å…¶ä»–å‡çº§æ“ä½œ
                 }
             }
         }
@@ -961,26 +963,26 @@ void Tower::upgradeTower3(const cocos2d::Vec2& touchPos)
 }
 void Tower::upgradeCarrot(const cocos2d::Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // ³¢ÊÔ½«½Úµã×ª»»Îª Carrot ÀàĞÍ
+            // å°è¯•å°†èŠ‚ç‚¹è½¬æ¢ä¸º Carrot ç±»å‹
             Carrot* carrot = dynamic_cast<Carrot*>(child);
             if (carrot)
             {
-                // »ñÈ¡ÊÀ½ç×ø±ê
+                // è·å–ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚ·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
-                {// Éı¼¶ÂÜ²·£¬µ«ÏŞÖÆ×î´óµÈ¼¶Îª3
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
+                {// å‡çº§èåœï¼Œä½†é™åˆ¶æœ€å¤§ç­‰çº§ä¸º3
                     if (carrot->level < 3)
                     {
                         carrot->levelUp();
@@ -995,162 +997,162 @@ void Tower::upgradeCarrot(const cocos2d::Vec2& touchPos)
 
 void Tower::removeTowerAt(const Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Tower* tower = dynamic_cast<Tower*>(child);
             if (tower)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                 {
-                    // ´Ó¸¸½ÚµãÖĞÒÆ³ıÅÚËş
+                    // ä»çˆ¶èŠ‚ç‚¹ä¸­ç§»é™¤ç‚®å¡”
                     child->removeFromParent();
-                    return; // ÕÒµ½²¢ÒÆ³ıÅÚËşºó½áÊøº¯Êı
+                    return; // æ‰¾åˆ°å¹¶ç§»é™¤ç‚®å¡”åç»“æŸå‡½æ•°
                 }
             }
         }
-        //// ±éÀú×Ó½Úµã£¬²éÕÒÓë´¥ÃşµãÎ»ÖÃÏà½üµÄÅÚËş
+        //// éå†å­èŠ‚ç‚¹ï¼ŒæŸ¥æ‰¾ä¸è§¦æ‘¸ç‚¹ä½ç½®ç›¸è¿‘çš„ç‚®å¡”
         //for (Node* child : getChildren())
         //{
-        //    // ¼ì²é½ÚµãÊÇ·ñÊÇ Tower ÀàĞÍÇÒÒÑ¾­·ÅÖÃ
+        //    // æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower ç±»å‹ä¸”å·²ç»æ”¾ç½®
         //    if (dynamic_cast<Tower*>(child) && dynamic_cast<Tower*>(child)->isPlaced())
         //    {
-        //        // »ñÈ¡½ÚµãµÄÊÀ½ç×ø±ê
+        //        // è·å–èŠ‚ç‚¹çš„ä¸–ç•Œåæ ‡
         //        Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-        //        // ¼ì²é´¥ÃşµãÊÇ·ñ½Ó½üÅÚËşµÄÎ»ÖÃ
-        //        if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ¾àÀë
+        //        // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦æ¥è¿‘ç‚®å¡”çš„ä½ç½®
+        //        if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è·ç¦»
         //        {
-        //            // ´Ó¸¸½ÚµãÖĞÒÆ³ıÅÚËş
+        //            // ä»çˆ¶èŠ‚ç‚¹ä¸­ç§»é™¤ç‚®å¡”
         //            child->removeFromParent();
-        //            return; // ÕÒµ½²¢ÒÆ³ıÅÚËşºó½áÊøº¯Êı
+        //            return; // æ‰¾åˆ°å¹¶ç§»é™¤ç‚®å¡”åç»“æŸå‡½æ•°
         //        }
         //    }
     }
 
-    // Èç¹ûÎ´ÕÒµ½ÒªÉ¾³ıµÄÅÚËş
+    // å¦‚æœæœªæ‰¾åˆ°è¦åˆ é™¤çš„ç‚®å¡”
     CCLOG("Error: Tower not found at position (%f, %f)", touchPos.x, touchPos.y);
 }
 void Tower::removeTowerAt2(const Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Tower2* tower2 = dynamic_cast<Tower2*>(child);
             if (tower2)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                 {
-                    // ´Ó¸¸½ÚµãÖĞÒÆ³ıÅÚËş
+                    // ä»çˆ¶èŠ‚ç‚¹ä¸­ç§»é™¤ç‚®å¡”
                     child->removeFromParent();
-                    return; // ÕÒµ½²¢ÒÆ³ıÅÚËşºó½áÊøº¯Êı
+                    return; // æ‰¾åˆ°å¹¶ç§»é™¤ç‚®å¡”åç»“æŸå‡½æ•°
                 }
             }
         }
-        //// ±éÀú×Ó½Úµã£¬²éÕÒÓë´¥ÃşµãÎ»ÖÃÏà½üµÄÅÚËş
+        //// éå†å­èŠ‚ç‚¹ï¼ŒæŸ¥æ‰¾ä¸è§¦æ‘¸ç‚¹ä½ç½®ç›¸è¿‘çš„ç‚®å¡”
         //for (Node* child : getChildren())
         //{
-        //    // ¼ì²é½ÚµãÊÇ·ñÊÇ Tower ÀàĞÍÇÒÒÑ¾­·ÅÖÃ
+        //    // æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower ç±»å‹ä¸”å·²ç»æ”¾ç½®
         //    if (dynamic_cast<Tower*>(child) && dynamic_cast<Tower*>(child)->isPlaced())
         //    {
-        //        // »ñÈ¡½ÚµãµÄÊÀ½ç×ø±ê
+        //        // è·å–èŠ‚ç‚¹çš„ä¸–ç•Œåæ ‡
         //        Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-        //        // ¼ì²é´¥ÃşµãÊÇ·ñ½Ó½üÅÚËşµÄÎ»ÖÃ
-        //        if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ¾àÀë
+        //        // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦æ¥è¿‘ç‚®å¡”çš„ä½ç½®
+        //        if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è·ç¦»
         //        {
-        //            // ´Ó¸¸½ÚµãÖĞÒÆ³ıÅÚËş
+        //            // ä»çˆ¶èŠ‚ç‚¹ä¸­ç§»é™¤ç‚®å¡”
         //            child->removeFromParent();
-        //            return; // ÕÒµ½²¢ÒÆ³ıÅÚËşºó½áÊøº¯Êı
+        //            return; // æ‰¾åˆ°å¹¶ç§»é™¤ç‚®å¡”åç»“æŸå‡½æ•°
         //        }
         //    }
     }
 
-    // Èç¹ûÎ´ÕÒµ½ÒªÉ¾³ıµÄÅÚËş
+    // å¦‚æœæœªæ‰¾åˆ°è¦åˆ é™¤çš„ç‚®å¡”
     CCLOG("Error: Tower not found at position (%f, %f)", touchPos.x, touchPos.y);
 }
 void Tower::removeTowerAt3(const Vec2& touchPos)
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
 
-        // ±éÀú×Ó½Úµã
+        // éå†å­èŠ‚ç‚¹
         for (Node* child : children)
         {
-            // Ê¹ÓÃ dynamic_cast ¼ì²é½ÚµãÊÇ·ñÊÇ Tower2 ÀàĞÍ
+            // ä½¿ç”¨ dynamic_cast æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower2 ç±»å‹
             Tower3* tower3 = dynamic_cast<Tower3*>(child);
             if (tower3)
             {
-                // »ñÈ¡ÅÚËşµÄÊÀ½ç×ø±ê
+                // è·å–ç‚®å¡”çš„ä¸–ç•Œåæ ‡
                 Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-                // ¼ì²é´¥ÃşµãÊÇ·ñÔÚÅÚËş·¶Î§ÄÚ
-                if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ´¥Ãş·¶Î§
+                // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦åœ¨ç‚®å¡”èŒƒå›´å†…
+                if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è§¦æ‘¸èŒƒå›´
                 {
-                    // ´Ó¸¸½ÚµãÖĞÒÆ³ıÅÚËş
+                    // ä»çˆ¶èŠ‚ç‚¹ä¸­ç§»é™¤ç‚®å¡”
                     child->removeFromParent();
-                    return; // ÕÒµ½²¢ÒÆ³ıÅÚËşºó½áÊøº¯Êı
+                    return; // æ‰¾åˆ°å¹¶ç§»é™¤ç‚®å¡”åç»“æŸå‡½æ•°
                 }
             }
         }
-        //// ±éÀú×Ó½Úµã£¬²éÕÒÓë´¥ÃşµãÎ»ÖÃÏà½üµÄÅÚËş
+        //// éå†å­èŠ‚ç‚¹ï¼ŒæŸ¥æ‰¾ä¸è§¦æ‘¸ç‚¹ä½ç½®ç›¸è¿‘çš„ç‚®å¡”
         //for (Node* child : getChildren())
         //{
-        //    // ¼ì²é½ÚµãÊÇ·ñÊÇ Tower ÀàĞÍÇÒÒÑ¾­·ÅÖÃ
+        //    // æ£€æŸ¥èŠ‚ç‚¹æ˜¯å¦æ˜¯ Tower ç±»å‹ä¸”å·²ç»æ”¾ç½®
         //    if (dynamic_cast<Tower*>(child) && dynamic_cast<Tower*>(child)->isPlaced())
         //    {
-        //        // »ñÈ¡½ÚµãµÄÊÀ½ç×ø±ê
+        //        // è·å–èŠ‚ç‚¹çš„ä¸–ç•Œåæ ‡
         //        Vec2 towerWorldPos = child->getParent()->convertToWorldSpace(child->getPosition());
 
-        //        // ¼ì²é´¥ÃşµãÊÇ·ñ½Ó½üÅÚËşµÄÎ»ÖÃ
-        //        if (touchPos.getDistance(towerWorldPos) < 50.0f) // µ÷Õû 50.0f ÎªÊÊµ±µÄ¾àÀë
+        //        // æ£€æŸ¥è§¦æ‘¸ç‚¹æ˜¯å¦æ¥è¿‘ç‚®å¡”çš„ä½ç½®
+        //        if (touchPos.getDistance(towerWorldPos) < 50.0f) // è°ƒæ•´ 50.0f ä¸ºé€‚å½“çš„è·ç¦»
         //        {
-        //            // ´Ó¸¸½ÚµãÖĞÒÆ³ıÅÚËş
+        //            // ä»çˆ¶èŠ‚ç‚¹ä¸­ç§»é™¤ç‚®å¡”
         //            child->removeFromParent();
-        //            return; // ÕÒµ½²¢ÒÆ³ıÅÚËşºó½áÊøº¯Êı
+        //            return; // æ‰¾åˆ°å¹¶ç§»é™¤ç‚®å¡”åç»“æŸå‡½æ•°
         //        }
         //    }
     }
 
-    // Èç¹ûÎ´ÕÒµ½ÒªÉ¾³ıµÄÅÚËş
+    // å¦‚æœæœªæ‰¾åˆ°è¦åˆ é™¤çš„ç‚®å¡”
     CCLOG("Error: Tower not found at position (%f, %f)", touchPos.x, touchPos.y);
 }
 
 
 void Tower::onTouchMoved(Touch* touch, Event* event)
 {
-    // ±£³Ö·ÀÓùËş¹Ì¶¨ÔÚÔ­µØ£¬²»¸úËæ´¥ÃşµãÒÆ¶¯
+    // ä¿æŒé˜²å¾¡å¡”å›ºå®šåœ¨åŸåœ°ï¼Œä¸è·Ÿéšè§¦æ‘¸ç‚¹ç§»åŠ¨
 }
 
 void Tower::onTouchEnded(Touch* touch, Event* event)
@@ -1159,92 +1161,92 @@ void Tower::onTouchEnded(Touch* touch, Event* event)
 
 }
 void Tower::update(float delta) {
-    // ÔÚ update º¯ÊıÖĞÊµÊ±¸üĞÂÅÚËşµÄ×ªÏòÂß¼­
-    handleBulletSpriteCollisions(); // µ÷ÓÃ´¦Àí×ªÏòµÄº¯Êı
+    // åœ¨ update å‡½æ•°ä¸­å®æ—¶æ›´æ–°ç‚®å¡”çš„è½¬å‘é€»è¾‘
+    handleBulletSpriteCollisions(); // è°ƒç”¨å¤„ç†è½¬å‘çš„å‡½æ•°
 
 }
-void Tower::handleBulletSpriteCollisions()//ÊµÏÖÅÚËş×ªÏò
+void Tower::handleBulletSpriteCollisions()//å®ç°ç‚®å¡”è½¬å‘
 {
-    // »ñÈ¡µ±Ç°½ÚµãËùÔÚµÄ³¡¾°
+    // è·å–å½“å‰èŠ‚ç‚¹æ‰€åœ¨çš„åœºæ™¯
     cocos2d::Scene* scene = Director::getInstance()->getRunningScene();
 
     if (scene)
     {
-        // »ñÈ¡³¡¾°ÖĞµÄËùÓĞ×Ó½Úµã
+        // è·å–åœºæ™¯ä¸­çš„æ‰€æœ‰å­èŠ‚ç‚¹
         Vector<Node*> children = scene->getChildren();
         currentTarget = nullptr;
-        // Èç¹ûµ±Ç°Ã»ÓĞÄ¿±ê£¬»òÕßµ±Ç°Ä¿±êÒÑ¾­±»Ïú»Ù£¬ÉèÖÃĞÂµÄÄ¿±ê
+        // å¦‚æœå½“å‰æ²¡æœ‰ç›®æ ‡ï¼Œæˆ–è€…å½“å‰ç›®æ ‡å·²ç»è¢«é”€æ¯ï¼Œè®¾ç½®æ–°çš„ç›®æ ‡
         if (currentTarget == nullptr /*|| currentTarget->isDestroyed()*/)
         {
-            // ±éÀú×Ó½Úµã
+            // éå†å­èŠ‚ç‚¹
             for (Node* child : children)
             {
-                // ¼ì²é×Ó½ÚµãÊÇ·ñÎª¹ÖÎï¾«ÁéÊµÀı
+                // æ£€æŸ¥å­èŠ‚ç‚¹æ˜¯å¦ä¸ºæ€ªç‰©ç²¾çµå®ä¾‹
                 Monster* monster = dynamic_cast<Monster*>(child);
                 if (monster)
                 {
-                    // »ñÈ¡ÅÚËşºÍ¹ÖÎïµÄÎ»ÖÃ
+                    // è·å–ç‚®å¡”å’Œæ€ªç‰©çš„ä½ç½®
                     Vec2 towerPos = this->getPosition();
                     Vec2 monsterPos = monster->getPosition();
 
-                    // ¼ÆËãÅÚËşÓë¹ÖÎïÖ®¼äµÄ¾àÀë
+                    // è®¡ç®—ç‚®å¡”ä¸æ€ªç‰©ä¹‹é—´çš„è·ç¦»
                     float distance = towerPos.distance(monsterPos);
 
-                    // ÉèÖÃÒ»¸ö¾àÀëãĞÖµ£¬ÀıÈç 500 ÏñËØ
+                    // è®¾ç½®ä¸€ä¸ªè·ç¦»é˜ˆå€¼ï¼Œä¾‹å¦‚ 500 åƒç´ 
                     if (towerLevel == 1)
                     {
                         float distanceThreshold = 300.0f;
-                        // Èç¹û¾àÀëĞ¡ÓÚãĞÖµ£¬ÉèÖÃÎªÄ¿±ê
+                        // å¦‚æœè·ç¦»å°äºé˜ˆå€¼ï¼Œè®¾ç½®ä¸ºç›®æ ‡
                         if (distance < distanceThreshold)
                         {
                             currentTarget = monster;
-                            break; // ÕÒµ½Ä¿±êºó¿ÉÒÔÌáÇ°ÍË³öÑ­»·
+                            break; // æ‰¾åˆ°ç›®æ ‡åå¯ä»¥æå‰é€€å‡ºå¾ªç¯
                         }
                     }
                     else if (towerLevel == 2)
                     {
                         float distanceThreshold = 500.0f;
-                        // Èç¹û¾àÀëĞ¡ÓÚãĞÖµ£¬ÉèÖÃÎªÄ¿±ê
+                        // å¦‚æœè·ç¦»å°äºé˜ˆå€¼ï¼Œè®¾ç½®ä¸ºç›®æ ‡
                         if (distance < distanceThreshold)
                         {
                             currentTarget = monster;
-                            break; // ÕÒµ½Ä¿±êºó¿ÉÒÔÌáÇ°ÍË³öÑ­»·
+                            break; // æ‰¾åˆ°ç›®æ ‡åå¯ä»¥æå‰é€€å‡ºå¾ªç¯
                         }
                     }
                     else if (towerLevel == 3)
                     {
                         float distanceThreshold = 700.0f;
-                        // Èç¹û¾àÀëĞ¡ÓÚãĞÖµ£¬ÉèÖÃÎªÄ¿±ê
+                        // å¦‚æœè·ç¦»å°äºé˜ˆå€¼ï¼Œè®¾ç½®ä¸ºç›®æ ‡
                         if (distance < distanceThreshold)
                         {
                             currentTarget = monster;
-                            break; // ÕÒµ½Ä¿±êºó¿ÉÒÔÌáÇ°ÍË³öÑ­»·
+                            break; // æ‰¾åˆ°ç›®æ ‡åå¯ä»¥æå‰é€€å‡ºå¾ªç¯
                         }
                     }
                 }
             }
         }
 
-        // Èç¹ûµ±Ç°ÓĞÄ¿±ê£¬¼ÆËãÅÚËşÖ¸Ïò¹ÖÎïµÄ½Ç¶È
+        // å¦‚æœå½“å‰æœ‰ç›®æ ‡ï¼Œè®¡ç®—ç‚®å¡”æŒ‡å‘æ€ªç‰©çš„è§’åº¦
         if (currentTarget)
         {
             Vec2 towerPos = this->getPosition();
             Vec2 monsterPos = currentTarget->getPosition();
 
             float angle = atan2f(monsterPos.y - towerPos.y, monsterPos.x - towerPos.x);
-            angle = CC_RADIANS_TO_DEGREES(angle); // ½«»¡¶È×ª»»Îª½Ç¶È
+            angle = CC_RADIANS_TO_DEGREES(angle); // å°†å¼§åº¦è½¬æ¢ä¸ºè§’åº¦
 
-            // ÉèÖÃÅÚËşĞı×ª½Ç¶È
-            this->setRotation(-angle + 90); // ×¢ÒâÕâÀï¿ÉÄÜĞèÒªµ÷Õû½Ç¶È£¬¾ßÌåÇé¿ö¸ù¾İÄãµÄÓÎÏ·×ø±êÏµ¶ø¶¨
+            // è®¾ç½®ç‚®å¡”æ—‹è½¬è§’åº¦
+            this->setRotation(-angle + 90); // æ³¨æ„è¿™é‡Œå¯èƒ½éœ€è¦è°ƒæ•´è§’åº¦ï¼Œå…·ä½“æƒ…å†µæ ¹æ®ä½ çš„æ¸¸æˆåæ ‡ç³»è€Œå®š
         }
     }
 }
 
 void Tower::showSelectionIcon(const Vec2& position) {
-    // ´´½¨Ñ¡ÖĞÍ¼±ê¾«Áé
-    auto selectionSprite = Sprite::create("select_02.png"); // Ê¹ÓÃÄã×Ô¼ºµÄÑ¡ÖĞÍ¼±êÍ¼Æ¬Â·¾¶
+    // åˆ›å»ºé€‰ä¸­å›¾æ ‡ç²¾çµ
+    auto selectionSprite = Sprite::create("select_02.png"); // ä½¿ç”¨ä½ è‡ªå·±çš„é€‰ä¸­å›¾æ ‡å›¾ç‰‡è·¯å¾„
     selectionSprite->setPosition(position);
-    selectionSprite->setName("SelectionIcon"); // ÉèÖÃÑ¡ÖĞÍ¼±êµÄÃû³Æ
+    selectionSprite->setName("SelectionIcon"); // è®¾ç½®é€‰ä¸­å›¾æ ‡çš„åç§°
     this->getParent()->addChild(selectionSprite);
 }
 
@@ -1255,7 +1257,7 @@ void Tower::removeSelectionIcon() {
     }
 }
 
-//ÈıÖÖ×Óµ¯µÄÉä»÷
+//ä¸‰ç§å­å¼¹çš„å°„å‡»
 void Tower::shootBullet1(float dt)
 {
     if (currentTarget != nullptr) {
