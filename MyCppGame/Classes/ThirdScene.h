@@ -6,6 +6,8 @@
 #include"Tower.h"
 #include"Tower2.h"
 #include"Tower3.h"
+#include <iostream>
+#include <fstream>
 
 ///////////////////////声明第二个场景，也就是游戏界面（map）//////////////////////
 class ThirdScene : public cocos2d::Scene
@@ -28,7 +30,6 @@ public:
     ///    暂停按钮
     int stopCount = 1;
     void stopORstart(Ref* pSender);
-
 
 
     int round = 1;

@@ -86,8 +86,26 @@ bool ThirdScene::init()
             "back.png",
             "back_pressed.png",
             CC_CALLBACK_1(ThirdScene::menuBack, this));
-            homeItem->setPosition(30,1250);
+
+        // 检查图标是否加载成功，若未加载成功，则输出问题信息
+        if (homeItem == nullptr ||
+            homeItem->getContentSize().width <= 0 ||
+            homeItem->getContentSize().height <= 0)
+        {
+            problemLoading("'return.png' 和 'return.png'");
+        }
+        else
+        {
+            // 设置返回按钮的位置为左上角
+            float x = 30;
+            float y = 1250;
+            homeItem->setPosition(Vec2(x, y));
+
+        }
+
+
         // 创建菜单，这是一个自动释放的对象
+        //回到主页面
         auto menu = Menu::create(homeItem, NULL);
         menu->setPosition(Vec2::ZERO);
         this->addChild(menu, 1);
@@ -172,10 +190,13 @@ bool ThirdScene::init()
     menust->setPosition(Vec2::ZERO);
     this->addChild(menust, 3);
 
+    /******************************************************************开场倒计时****************************************************/
+
+    schedule(CC_SCHEDULE_SELECTOR(ThirdScene::countDown), 1.0f, 2, 0);
+
 
     /******************************************************************创建萝卜****************************************************/
     auto carrot = Carrot::createSprite(760, 1012);
-    carrot->setTag(1);
     addChild(carrot,3);
 
     /************************************************************************创建怪物精灵***********************************************************************/
@@ -194,10 +215,6 @@ bool ThirdScene::init()
     this->addChild(tower);
     Tower2* fan = Tower2::createTower("Fan11.png");
     this->addChild(fan);
-    /******************************************************************开场倒计时****************************************************/
-
-    schedule(CC_SCHEDULE_SELECTOR(ThirdScene::countDown), 1.0f, 2, 0);
-
 
     return true;
 }
@@ -287,24 +304,24 @@ void ThirdScene::createAndMoveMonster1(float dt)
         //第一种怪物
         if (round1_ % 3 == 0) {
             //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-            Monster* monster = Monster::create(50.0f, 100, "monster0.png", 110, 100, path);
+            Monster* monster = Monster::create(70.0f, 200, "monster0.png", 110, 100, path);
             monster->setPosition(Vec2(312 * 4, 103 * 4));
             addChild(monster);
         }
         if (round1_ % 3 == 1) {
             //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-            Monster* monster = Monster::create(50.0f, 100, "monster1.png", 100, 100, path);
+            Monster* monster = Monster::create(70.0f, 200, "monster1.png", 100, 100, path);
             monster->setPosition(Vec2(312 * 4, 103 * 4));
             addChild(monster);
         }
         if (round1_ % 3 == 2) {
             //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-            Monster* monster = Monster::create(50.0f, 100, "monster2.png", 110, 100, path);
+            Monster* monster = Monster::create(70.0f, 200, "monster2.png", 110, 100, path);
             monster->setPosition(Vec2(312*4, 103*4));
             addChild(monster);
         }
 
-        if (round1_ == 10)
+        if (round1_ == 15)
         {
             round = 2;
             auto schedulerCallback = [=](float dt) {
@@ -315,7 +332,7 @@ void ThirdScene::createAndMoveMonster1(float dt)
                 };
 
             // 延迟 7 秒后执行第一次调度
-            this->scheduleOnce(schedulerCallback, 40.0f, "  ");
+            this->scheduleOnce(schedulerCallback, 30.0f, "  ");
         }
     }
 }
@@ -335,24 +352,24 @@ void ThirdScene::createAndMoveMonster2(float dt)
         //第一种怪物
         if (round2_ % 3 == 0) {
             //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-            Monster* monster = Monster::create(50.0f, 100, "monster0.png", 110, 100, path);
+            Monster* monster = Monster::create(70.0f, 200, "monster0.png", 110, 100, path);
             monster->setPosition(Vec2(312 * 4, 103 * 4));
             addChild(monster);
         }
         if (round2_ % 3 == 1) {
             //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-            Monster* monster = Monster::create(50.0f, 100, "monster1.png", 100, 100, path);
+            Monster* monster = Monster::create(70.0f, 200, "monster1.png", 100, 100, path);
             monster->setPosition(Vec2(312 * 4, 103 * 4));
             addChild(monster);
         }
         if (round2_ % 3 == 2) {
             //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-            Monster* monster = Monster::create(50.0f, 100, "monster2.png", 110, 100, path);
+            Monster* monster = Monster::create(70.0f, 200, "monster2.png", 110, 100, path);
             monster->setPosition(Vec2(312 * 4, 103 * 4));
             addChild(monster);
         }
 
-        if (round2_ == 16)
+        if (round2_ == 20)
         {
             round = 3;
             auto schedulerCallback = [=](float dt) {
@@ -363,7 +380,7 @@ void ThirdScene::createAndMoveMonster2(float dt)
                 };
 
             // 延迟 7 秒后执行第一次调度
-            this->scheduleOnce(schedulerCallback, 20.0f, "  ");
+            this->scheduleOnce(schedulerCallback, 30.0f, "  ");
 
         }
     }
@@ -398,12 +415,12 @@ void ThirdScene::createAndMoveMonster3(float dt)
         }
         if (round3_ % 3 == 2) {
             //用于传递参数，                     先后为：速度、 生命值、 贴图、        伤害、价值、路径
-            Monster* monster = Monster::create(50.0f, 100, "monster2.png", 110, 100, path);
+            Monster* monster = Monster::create(80.0f, 100, "monster2.png", 110, 100, path);
             monster->setPosition(Vec2(312 * 4, 103 * 4));
             addChild(monster);
         }
 
-        if (round3_ == 20)
+        if (round3_ == 30)
         {
             round = 4;
         }
