@@ -1,7 +1,7 @@
 #pragma once
 #ifndef __TOWER_H__
 #define __TOWER_H__
-#define MAX_TOWER_LEVEL 3  // ºê¶¨ÒåÅÚËşµÄ×î´óµÈ¼¶
+#define MAX_TOWER_LEVEL 3  // å®å®šä¹‰ç‚®å¡”çš„æœ€å¤§ç­‰çº§
 #include "cocos2d.h"
 #include"Tower2.h"
 #include"Monster.h"
@@ -9,8 +9,8 @@ class Tower : public cocos2d::Sprite
 {
 public:
     Monster* currentTarget;
-    static Tower* createTower(const std::string& towerImage); // ´´½¨·ÀÓùËşÊµÀıµÄ¾²Ì¬·½·¨
-    bool init(const std::string& towerImage); // ³õÊ¼»¯·½·¨
+    static Tower* createTower(const std::string& towerImage); // åˆ›å»ºé˜²å¾¡å¡”å®ä¾‹çš„é™æ€æ–¹æ³•
+    bool init(const std::string& towerImage); // åˆå§‹åŒ–æ–¹æ³•
 
     bool isPlaced() const;
     void setPlaced(bool placed);
@@ -19,15 +19,15 @@ public:
     bool Tower::isTouchOnTower3(const cocos2d::Vec2& touchPos);
     bool Tower::isTouchOnTower4(const cocos2d::Vec2& touchPos);
 
-    //Ê£ÏÂµÄµÈ¹ÖÎïºÍ×Óµ¯Ğ´ºÃ
-    // µã»÷ÊÂ¼ş´¦Àíº¯Êı
-    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);//ÔÚ¸Õ¸Õ´¥ÃşÊ±µ÷ÓÃ
-    void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);//ÔÚÊó±êµã»÷ÍÏ¶¯Ê±µ÷ÓÃ£¬ÎÒ°ÑÄÚÈİÉèÎªÁË¿ÕÄÚÈİ£¬ÕâÑùÅÚËş²»»áÂÒ¶¯
-    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);//ÔÚ½áÊø´¥ÃşÊ±µ÷ÓÃ£¬Ò²ÊÇ¿ÕÄÚÈİ
+    //å‰©ä¸‹çš„ç­‰æ€ªç‰©å’Œå­å¼¹å†™å¥½
+    // ç‚¹å‡»äº‹ä»¶å¤„ç†å‡½æ•°
+    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);//åœ¨åˆšåˆšè§¦æ‘¸æ—¶è°ƒç”¨
+    void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);//åœ¨é¼ æ ‡ç‚¹å‡»æ‹–åŠ¨æ—¶è°ƒç”¨ï¼Œæˆ‘æŠŠå†…å®¹è®¾ä¸ºäº†ç©ºå†…å®¹ï¼Œè¿™æ ·ç‚®å¡”ä¸ä¼šä¹±åŠ¨
+    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);//åœ¨ç»“æŸè§¦æ‘¸æ—¶è°ƒç”¨ï¼Œä¹Ÿæ˜¯ç©ºå†…å®¹
 
-    // ÆäËû·½·¨...
-    void Tower::onMenuItemClicked(Ref* sender);//TĞÍÅÚËşÑ¡ÖĞ°´Å¥µÄ»Øµ÷º¯Êı
-    void Tower::onMenuItemClicked2(Ref* sender);//·çÉÈÅÚËşÑ¡ÖĞ°´Å¥µÄ»Øµ÷º¯Êı
+    // å…¶ä»–æ–¹æ³•...
+    void Tower::onMenuItemClicked(Ref* sender);//Tå‹ç‚®å¡”é€‰ä¸­æŒ‰é’®çš„å›è°ƒå‡½æ•°
+    void Tower::onMenuItemClicked2(Ref* sender);//é£æ‰‡ç‚®å¡”é€‰ä¸­æŒ‰é’®çš„å›è°ƒå‡½æ•°
     void Tower::onMenuItemClicked3(Ref* sender);
     void Tower::onMenuItemClicked4(Ref* sender);
     void Tower::onMenuItemClicked5(Ref* sender);
@@ -39,26 +39,26 @@ public:
     void Tower::removeTowerAt(const cocos2d::Vec2& touchPos);
     void Tower::removeTowerAt2(const cocos2d::Vec2& touchPos);
     void Tower::removeTowerAt3(const cocos2d::Vec2& touchPos);
-    void Tower::removeTowerButton();//ÔÚµÚ¶ş´Îµã»÷Ê±³ıÈ¥Ö®Ç°µÄÅÚËşĞı×ª°´Å¥
-    void Tower::handleBulletSpriteCollisions();//ÅÚËşĞı×ª
-    void Tower::update(float delta);//Ã¿Ò»Ö¡¶¼¸üĞÂÅÚËş×´Ì¬
-    void Tower::upgradeTower(const cocos2d::Vec2& touchPos);//ÅÚËşÉı¼¶º¯Êı
+    void Tower::removeTowerButton();//åœ¨ç¬¬äºŒæ¬¡ç‚¹å‡»æ—¶é™¤å»ä¹‹å‰çš„ç‚®å¡”æ—‹è½¬æŒ‰é’®
+    void Tower::handleBulletSpriteCollisions(float dt);//ç‚®å¡”æ—‹è½¬
+    void Tower::update(float delta);//æ¯ä¸€å¸§éƒ½æ›´æ–°ç‚®å¡”çŠ¶æ€
+    void Tower::upgradeTower(const cocos2d::Vec2& touchPos);//ç‚®å¡”å‡çº§å‡½æ•°
     void Tower::upgradeTower2(const cocos2d::Vec2& touchPos);
     void Tower::upgradeTower3(const cocos2d::Vec2& touchPos);
-    void Tower::upgradeCarrot(const cocos2d::Vec2& touchPos);//ÂÜ²·Éı¼¶º¯Êı
-    void Tower::showSelectionIcon(const cocos2d::Vec2& position);//Ñ¡ÖĞÍ¼±êµÄ´´½¨º¯Êı
-    void Tower::removeSelectionIcon();//Ñ¡ÖĞÍ¼±êµÄÒÆ³ıº¯Êı
+    void Tower::upgradeCarrot(const cocos2d::Vec2& touchPos);//èåœå‡çº§å‡½æ•°
+    void Tower::showSelectionIcon(const cocos2d::Vec2& position);//é€‰ä¸­å›¾æ ‡çš„åˆ›å»ºå‡½æ•°
+    void Tower::removeSelectionIcon();//é€‰ä¸­å›¾æ ‡çš„ç§»é™¤å‡½æ•°
     void Tower::shootBullet1(float dt);
 
 private:
 
     cocos2d::Vec2 towerposition;
-    int towerLevel = 1;//¶¨ÒåÅÚËşµÈ¼¶£¬ºóĞøÍ¨¹ıupgradeTowerº¯ÊıÊµÏÖÉı¼¶
-    // ³ÉÔ±±äÁ¿±£´æ´¥ÃşµãµÄÎ»ÖÃ
+    int towerLevel = 1;//å®šä¹‰ç‚®å¡”ç­‰çº§ï¼Œåç»­é€šè¿‡upgradeTowerå‡½æ•°å®ç°å‡çº§
+    // æˆå‘˜å˜é‡ä¿å­˜è§¦æ‘¸ç‚¹çš„ä½ç½®
     cocos2d::Vec2 m_lastTouchPos;
-    std::string m_towerImage; // ·ÀÓùËşµÄÍ¼Æ¬Â·¾¶
-    // ÔÚ Tower ÀàÖĞÌí¼ÓÒ»¸ö³ÉÔ±±äÁ¿À´±£´æµ±Ç°Ä¿±ê¹ÖÎïµÄÒıÓÃ
-    // ÆäËû³ÉÔ±±äÁ¿...
+    std::string m_towerImage; // é˜²å¾¡å¡”çš„å›¾ç‰‡è·¯å¾„
+    // åœ¨ Tower ç±»ä¸­æ·»åŠ ä¸€ä¸ªæˆå‘˜å˜é‡æ¥ä¿å­˜å½“å‰ç›®æ ‡æ€ªç‰©çš„å¼•ç”¨
+    // å…¶ä»–æˆå‘˜å˜é‡...
 };
 
 #endif // __TOWER_H__
