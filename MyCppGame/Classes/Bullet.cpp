@@ -87,13 +87,19 @@ bool Bullet::init()
         animateSprite->runAction(RepeatForever::create(animate));//运行动画
     }
 
+    schedule(CC_SCHEDULE_SELECTOR(Bullet::update));
+
     return true;
 }
 
 void Bullet::update(float dt)
 {
-    if (bulletKind == 2) this->setRotation(this->getRotation() + 10);
+    if (monsterTarget == nullptr)
+    {
+        return;
+    }
 
+    if (bulletKind == 2) this->setRotation(this->getRotation() + 10);
     //移动方向(风扇子弹比较特殊,要考虑穿透)
     Vec2 relativePos = this->getPosition();
     Vec2 absolutePos = this->getParent()->convertToWorldSpace(relativePos);
@@ -129,6 +135,7 @@ void Bullet::update(float dt)
             Coin* coin = scene->getChildByTag<Coin*>(1001);
             coin->coinCount += monsterTarget->value;
             monsterTarget->removeFromParent();
+            monsterTarget = nullptr;
         }
         //if(bulletKind != 2)//除风扇子弹外，其余类型子弹均不穿透
         removeFromParent();//将子弹从场景中移除
